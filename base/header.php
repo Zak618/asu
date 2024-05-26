@@ -25,7 +25,7 @@ session_start();
             <a class="nav-link px-2 link-dark" href="../profile.php">Профиль</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link px-2 link-dark" href="#">Мероприятия</a>
+            <a class="nav-link px-2 link-dark" href="../events.php">Мероприятия</a>
           </li>
           <li class="nav-item">
             <a class="nav-link px-2 link-dark" href="#">Сертификаты</a>
