@@ -116,7 +116,7 @@
 }
 
 .participate-btn {
-    background-color: #ff5f5f;
+    background-color: #284b63;
     color: white;
     padding: 10px 20px;
     border: none;
@@ -127,4 +127,39 @@
 
 .participate-btn:hover {
     background-color: #b1b1b1;
+}
+
+.btn-group {
+    display: flex;
+}
+
+.cancel-btn {
+    background-color: #b1b1b1;
+    
+    border: 1px solid #ff5f5f;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.certificate-btn {
+    background-color: #284b63;
+    color: white;
+    padding: 8px 18px;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.cancel-btn:hover {
+    background-color: #ff5f5f;
+    border: 1px solid #ff5f5f;
+}
+
+.certificate-btn:hover {
+    background-color: #396b8d;
+    border:none;
 }

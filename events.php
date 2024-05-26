@@ -2,7 +2,7 @@
 include_once "./base/header.php";
 include_once "./database/db.php";
 
-// Запрос на получение всех мероприятий
+
 $sql = "SELECT * FROM event ORDER BY start_date ASC";
 $result = mysqli_query($conn, $sql);
 
@@ -13,17 +13,28 @@ if ($result && mysqli_num_rows($result) > 0) {
         $events[] = $row;
     }
 }
+
+$student_id = $_SESSION['user_id']; // Идентификатор студента из сессии
+$participation_sql = "SELECT event_id FROM event_participation WHERE student_id = $student_id";
+$participation_result = mysqli_query($conn, $participation_sql);
+
+$participated_events = [];
+if ($participation_result && mysqli_num_rows($participation_result) > 0) {
+    while ($row = mysqli_fetch_assoc($participation_result)) {
+        $participated_events[] = $row['event_id'];
+    }
+}
 ?>
 
 <div class="container">
     <h2 class="text-center mb-4">Мероприятия</h2>
     <div class="row">
-        <?php if (empty($events)): ?>
+        <?php if (empty($events)) : ?>
             <div class="col-12">
                 <p class="text-center">Нет мероприятий</p>
             </div>
-        <?php else: ?>
-            <?php foreach ($events as $event): ?>
+        <?php else : ?>
+            <?php foreach ($events as $event) : ?>
                 <div class="col-12 col-md-6 col-lg-4 mb-4">
                     <div class="ticket-container">
                         <div class="ticket-card">
@@ -44,7 +55,15 @@ if ($result && mysqli_num_rows($result) > 0) {
                                 <span><strong>Монет победителю:</strong> <?php echo htmlspecialchars($event['points_winner']); ?></span>
                                 <span><strong>Монет призёру:</strong> <?php echo htmlspecialchars($event['points_prize']); ?></span>
                                 <span><strong>Монет участнику:</strong> <?php echo htmlspecialchars($event['points_participant']); ?></span>
-                                <button class="participate-btn">Участвую</button>
+                                <?php if (in_array($event['id'], $participated_events)) : ?>
+                                    <div class="btn-group">
+                                        <button class="btn cancel-btn" data-event-id="<?php echo $event['id']; ?>">Отменить</button>
+                                        <button class="btn certificate-btn" data-event-id="<?php echo $event['id']; ?>">Загрузить</button>
+                                    </div>
+
+                                <?php else : ?>
+                                    <button class="participate-btn" data-event-id="<?php echo $event['id']; ?>">Участвую</button>
+                                <?php endif; ?>
                             </div>
                         </div>
                     </div>
@@ -53,6 +72,49 @@ if ($result && mysqli_num_rows($result) > 0) {
         <?php endif; ?>
     </div>
 </div>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const participateButtons = document.querySelectorAll('.participate-btn');
+        const cancelButtons = document.querySelectorAll('.cancel-btn');
+
+        participateButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const eventId = this.getAttribute('data-event-id');
+                handleParticipation(eventId, 'participate');
+            });
+        });
+
+        cancelButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const eventId = this.getAttribute('data-event-id');
+                handleParticipation(eventId, 'cancel');
+            });
+        });
+
+        function handleParticipation(eventId, action) {
+            fetch('./database/participate.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        event_id: eventId,
+                        action: action
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        location.reload();
+                    } else {
+                        alert('Произошла ошибка: ' + data.error);
+                    }
+                });
+        }
+    });
+</script>
+
+
 
 <?php
 include_once "./base/footer.php";
