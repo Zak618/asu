@@ -1,0 +1,51 @@
+.container {
+  background-color: #ffffff;
+}
+
+.profile {
+  padding: 20px;
+}
+
+.profile-picture-container {
+  position: relative;
+  display: inline-block;
+}
+
+.profile-picture {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+h3 {
+  margin-top: 10px;
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.profile-info p {
+  margin-top: 5px;
+  color: #777;
+}
+
+.btn-outline-secondary {
+  border-color: #6c757d;
+  color: #6c757d;
+  margin-top: 20px;
+}
+
+.btn-outline-secondary:hover {
+  background-color: #6c757d;
+  color: #fff;
+}
+
+.chart-container {
+  margin-top: 20px;
+  height: 400px;
+}
+
+#participationChart {
+  width: 100%;
+  height: 100%;
+}

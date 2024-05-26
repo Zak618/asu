@@ -1,25 +1,143 @@
 <?php
 include_once "./base/header.php";
 
+session_start();
 
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
     exit();
 }
 
+$user_name = $_SESSION['first_name'] . " " . $_SESSION['last_name'];
+$user_id = $_SESSION['user_id'];
+$user_email = $_SESSION['user_email'];
+$avatar_url = $_SESSION['avatar_url'];
+$group_name = $_SESSION['group_name'];
+$direction_code = $_SESSION['direction_code'] ?? null;
+$direction_name = $_SESSION['direction_name'] ?? null;
+$profile = $_SESSION['profile'] ?? null;
+$moderator_status = $_SESSION['moderator_status'] ?? null;
+$moderator_comment = $_SESSION['moderator_comment'] ?? null;
+$phone_number = $_SESSION['phone_number'] ?? null;
 ?>
 
 <div class="container">
     <div class="row justify-content-center">
-        <div class="col-md-8 col-lg-6">
-            <div class="profile">
-                <h2 class="text-center mb-4">Профиль</h2>
-                <p>Добро пожаловать, <?php echo htmlspecialchars($_SESSION['user_email']); ?>!</p>
-                <!-- Дополнительная информация о пользователе может быть добавлена здесь -->
+        <div class="col-md-10 col-lg-8">
+            <div class="profile text-center">
+                <div class="profile-picture-container">
+                    <img src="<?php echo htmlspecialchars($avatar_url); ?>" alt="Profile Picture" class="profile-picture mb-3">
+                </div>
+                <div class="profile-info">
+                    <h3><?php echo htmlspecialchars($user_name); ?></h3>
+                    <p><?php echo htmlspecialchars($group_name); ?> · <?php echo htmlspecialchars($user_email); ?></p>
+                </div>
+                
+                <button class="btn btn-outline-secondary mb-4" data-toggle="modal" data-target="#editProfileModal">Изменить данные</button>
+
+                <?php if ($direction_code && $direction_name && $profile): ?>
+                    <div class="profile-details">
+                        <p><strong>Код направления:</strong> <?php echo htmlspecialchars($direction_code); ?></p>
+                        <p><strong>Название направления:</strong> <?php echo htmlspecialchars($direction_name); ?></p>
+                        <p><strong>Профиль:</strong> <?php echo htmlspecialchars($profile); ?></p>
+                    </div>
+                <?php else: ?>
+                    <?php if ($moderator_status == 2): ?>
+                        <div class="alert alert-danger">
+                            Причина, по которой нельзя приобретать сертификаты: <?php echo htmlspecialchars($moderator_comment); ?>
+                        </div>
+                    <?php elseif ($moderator_status == 0): ?>
+                        <div class="alert alert-warning">
+                            Профиль на проверке.
+                        </div>
+                    <?php endif; ?>
+                <?php endif; ?>
+
+                <h4>Статистика моих участий</h4>
+                <div class="chart-container">
+                    <canvas id="participationChart"></canvas>
+                </div>
             </div>
         </div>
     </div>
 </div>
+<!-- Модальное окно для редактирования профиля -->
+<div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form action="./database/update_profile.php" method="POST" enctype="multipart/form-data">
+        <div class="modal-header">
+          <h5 class="modal-title" id="editProfileModalLabel">Редактировать профиль</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="firstName">Имя</label>
+            <input type="text" class="form-control" id="firstName" name="firstName" value="<?php echo htmlspecialchars($_SESSION['first_name']); ?>" required>
+          </div>
+          <div class="form-group">
+            <label for="lastName">Фамилия</label>
+            <input type="text" class="form-control" id="lastName" name="lastName" value="<?php echo htmlspecialchars($_SESSION['last_name']); ?>" required>
+          </div>
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" class="form-control" id="email" name="email" value="<?php echo htmlspecialchars($user_email); ?>" required>
+          </div>
+          <div class="form-group">
+            <label for="phoneNumber">Номер телефона</label>
+            <input type="text" class="form-control" id="phoneNumber" name="phoneNumber" value="<?php echo htmlspecialchars($phone_number); ?>" required>
+          </div>
+          <div class="form-group">
+            <label for="groupName">Группа</label>
+            <input type="text" class="form-control" id="groupName" name="groupName" value="<?php echo htmlspecialchars($group_name); ?>" required>
+          </div>
+          <div class="form-group">
+            <label for="avatar">Фотография</label>
+            <input type="file" class="form-control-file" id="avatar" name="avatar">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Отмена</button>
+          <button type="submit" class="btn btn-primary">Сохранить изменения</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const ctx = document.getElementById('participationChart').getContext('2d');
+    const participationChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ['Октябрь', 'Ноябрь', 'Декабрь', 'Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь'],
+            datasets: [{
+                label: 'Участия',
+                data: [5, 10, 3, 7, 15, 10, 5, 8, 12],
+                borderColor: 'rgba(75, 192, 192, 1)',
+                borderWidth: 2,
+                fill: false,
+                tension: 0.1
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 20
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false
+                }
+            }
+        }
+    });
+</script>
 
 <?php
 include_once "./base/footer.php";
