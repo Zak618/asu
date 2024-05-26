@@ -10,6 +10,7 @@ session_start();
   <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="../css/start.css">
   <link rel="stylesheet" href="../css/profile.css">
+  <link rel="stylesheet" href="../css/events.css">
 </head>
 
 <body>

@@ -1,0 +1,130 @@
+.ticket-card {
+    border-radius: 10px;
+    margin-bottom: 20px;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.3s;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.ticket-card:hover {
+    transform: scale(1.05);
+}
+
+.ticket-card::before,
+.ticket-card::after,
+.ticket-card .circle-top::before,
+.ticket-card .circle-top::after,
+.ticket-card .circle-bottom::before,
+.ticket-card .circle-bottom::after {
+    content: "";
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background: #fff;
+    border-radius: 50%;
+}
+
+.ticket-card::before,
+.ticket-card::after {
+    top: 129px;
+    transform: translateY(-50%);
+}
+
+.ticket-card .circle-top::before,
+.ticket-card .circle-top::after {
+    top: 129px;
+    transform: translateY(-50%);
+}
+
+.ticket-card .circle-bottom::before,
+.ticket-card .circle-bottom::after {
+    bottom: 177px;
+    transform: translateY(50%);
+}
+
+.ticket-card::before,
+.ticket-card .circle-top::before,
+.ticket-card .circle-bottom::before {
+    left: -10px;
+}
+
+.ticket-card::after,
+.ticket-card .circle-top::after,
+.ticket-card .circle-bottom::after {
+    right: -10px;
+}
+
+.ticket-header {
+    background-color: #ff5f5f;
+    color: white;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    border-bottom: 2px solid #e0e0e0;
+    height: 130px; /* Фиксированная высота для заголовка */
+}
+
+.ticket-body {
+    padding: 20px;
+    background-color: #dbdbdb;
+    flex-grow: 1;
+}
+
+.ticket-footer {
+    background-color: #b1b1b1;
+    padding: 15px 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 2px solid #e0e0e0;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+}
+
+.ticket-footer span {
+    display: block;
+    margin: 5px 0;
+}
+
+.badge-custom {
+    background-color: #ff4c4c;
+    color: #fff;
+    padding: 5px 10px;
+    border-radius: 5px;
+}
+
+.event-url {
+    word-break: break-all;
+    color: #007bff;
+    text-decoration: none;
+}
+
+.event-url:hover {
+    text-decoration: underline;
+}
+
+.ticket-container {
+    height: 100%;
+    display: flex;
+}
+
+.participate-btn {
+    background-color: #ff5f5f;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.participate-btn:hover {
+    background-color: #b1b1b1;
+}

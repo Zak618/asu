@@ -15,100 +15,6 @@ if ($result && mysqli_num_rows($result) > 0) {
 }
 ?>
 
-<style>
-    .ticket-card {
-        border-radius: 10px;
-        margin-bottom: 20px;
-        position: relative;
-        overflow: hidden;
-        transition: transform 0.3s;
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-    }
-
-    .ticket-card:hover {
-        transform: scale(1.05);
-    }
-
-    .ticket-card::before,
-    .ticket-card::after {
-        content: "";
-        position: absolute;
-        width: 20px;
-        height: 20px;
-        background: #fff;
-        border-radius: 50%;
-        top: 129px; /* Расположение полукруга */
-        transform: translateY(-50%);
-    }
-
-    .ticket-card::before {
-        left: -10px;
-    }
-
-    .ticket-card::after {
-        right: -10px;
-    }
-
-    .ticket-header {
-        background-color: #ff5f5f;
-        color: white;
-        padding: 15px 20px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        border-top-left-radius: 10px;
-        border-top-right-radius: 10px;
-        border-bottom: 2px solid #e0e0e0;
-        height: 130px; /* Фиксированная высота для заголовка */
-    }
-
-    .ticket-body {
-        padding: 20px;
-        background-color: #adb5bd;
-        flex-grow: 1;
-    }
-
-    .ticket-footer {
-        background-color: #f8f9fa;
-        padding: 15px 20px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        border-top: 2px solid #e0e0e0;
-        border-bottom-left-radius: 10px;
-        border-bottom-right-radius: 10px;
-    }
-
-    .ticket-footer span {
-        display: block;
-        margin: 5px 0;
-    }
-
-    .badge-custom {
-        background-color: #ff5f5f;
-        color: #fff;
-        padding: 5px 10px;
-        border-radius: 5px;
-    }
-
-    .event-url {
-        word-break: break-all;
-        color: #007bff;
-        text-decoration: none;
-    }
-
-    .event-url:hover {
-        text-decoration: underline;
-    }
-
-    .ticket-container {
-        height: 100%;
-        display: flex;
-    }
-</style>
-
 <div class="container">
     <h2 class="text-center mb-4">Мероприятия</h2>
     <div class="row">
@@ -121,6 +27,8 @@ if ($result && mysqli_num_rows($result) > 0) {
                 <div class="col-12 col-md-6 col-lg-4 mb-4">
                     <div class="ticket-container">
                         <div class="ticket-card">
+                            <div class="circle-top"></div>
+                            <div class="circle-bottom"></div>
                             <div class="ticket-header">
                                 <h5><?php echo htmlspecialchars($event['title']); ?></h5>
                                 <span class="badge badge-custom"><?php echo htmlspecialchars($event['event_level']); ?></span>
@@ -133,9 +41,10 @@ if ($result && mysqli_num_rows($result) > 0) {
                                 <p><strong>URL:</strong> <a class="event-url" href="<?php echo htmlspecialchars($event['event_url']); ?>" target="_blank"><?php echo htmlspecialchars($event['event_url']); ?></a></p>
                             </div>
                             <div class="ticket-footer">
-                                <span><strong>Очки победителя:</strong> <?php echo htmlspecialchars($event['points_winner']); ?></span>
-                                <span><strong>Очки за приз:</strong> <?php echo htmlspecialchars($event['points_prize']); ?></span>
-                                <span><strong>Очки за участие:</strong> <?php echo htmlspecialchars($event['points_participant']); ?></span>
+                                <span><strong>Монет победителю:</strong> <?php echo htmlspecialchars($event['points_winner']); ?></span>
+                                <span><strong>Монет призёру:</strong> <?php echo htmlspecialchars($event['points_prize']); ?></span>
+                                <span><strong>Монет участнику:</strong> <?php echo htmlspecialchars($event['points_participant']); ?></span>
+                                <button class="participate-btn">Участвую</button>
                             </div>
                         </div>
                     </div>
@@ -144,7 +53,6 @@ if ($result && mysqli_num_rows($result) > 0) {
         <?php endif; ?>
     </div>
 </div>
-
 
 <?php
 include_once "./base/footer.php";
