@@ -4,7 +4,7 @@ include_once "./base/header.php";
 include_once "./database/db.php";
 
 // Здесь идет запрос на ближайшие мероприятия
-$sql = "SELECT * FROM event ORDER BY start_date ASC";
+$sql = "SELECT * FROM event ORDER BY start_date ASC LIMIT 6";
 $result = mysqli_query($conn, $sql);
 
 $events = [];

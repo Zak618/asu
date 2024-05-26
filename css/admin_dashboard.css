@@ -1,0 +1,17 @@
+.card-body {
+    display: flex;
+    flex-direction: column;
+}
+
+.card-title {
+    font-size: 1.25rem;
+    margin-bottom: 0.75rem;
+}
+
+.card-text {
+    margin-bottom: 0.5rem;
+}
+
+.card .btn {
+    margin-top: 0.5rem;
+}
