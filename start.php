@@ -22,7 +22,7 @@ $currentYear = date("Y");
     <div class="row">
         <div class="col-12 mb-4">
             <h6 class="header-title">Ближайшие мероприятия</h6>
-            <h6 class="badge-custom"><?php echo $currentYear; ?></h6>
+            <h6 class="badge-custom1"><?php echo $currentYear; ?></h6>
         </div>
     </div>
     <div id="events-container" class="row">
