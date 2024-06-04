@@ -2,8 +2,21 @@
 include_once "./base/header.php";
 include_once "./database/db.php";
 
+// Получаем активную вкладку из GET-параметра, если она не установлена, по умолчанию показываем все мероприятия
+$active_tab = isset($_GET['tab']) ? $_GET['tab'] : 'all';
 
-$sql = "SELECT * FROM event ORDER BY start_date ASC";
+$student_id = $_SESSION['user_id']; // Идентификатор студента из сессии
+
+// SQL-запрос в зависимости от активной вкладки
+if ($active_tab == 'my') {
+    $sql = "SELECT e.* FROM event e 
+            JOIN event_participation ep ON e.id = ep.event_id 
+            WHERE ep.student_id = $student_id 
+            ORDER BY e.start_date ASC";
+} else {
+    $sql = "SELECT * FROM event ORDER BY start_date ASC";
+}
+
 $result = mysqli_query($conn, $sql);
 
 $events = [];
@@ -14,10 +27,8 @@ if ($result && mysqli_num_rows($result) > 0) {
     }
 }
 
-
 $moderator_status = $_SESSION['moderator_status']; // Статус модератора из сессии
 
-$student_id = $_SESSION['user_id']; // Идентификатор студента из сессии
 $participation_sql = "SELECT event_id FROM event_participation WHERE student_id = $student_id";
 $participation_result = mysqli_query($conn, $participation_sql);
 
@@ -31,6 +42,10 @@ if ($participation_result && mysqli_num_rows($participation_result) > 0) {
 
 <div class="container">
     <h2 class="text-center mb-4">Мероприятия</h2>
+    <div class="mb-4">
+        <a href="?tab=all" class="btn btn-outline-primary <?php echo $active_tab == 'all' ? 'active' : ''; ?>">Все мероприятия</a>
+        <a href="?tab=my" class="btn btn-outline-primary <?php echo $active_tab == 'my' ? 'active' : ''; ?>">Мои мероприятия</a>
+    </div>
     <div class="row">
         <?php if (empty($events)) : ?>
             <div class="col-12">
@@ -63,7 +78,6 @@ if ($participation_result && mysqli_num_rows($participation_result) > 0) {
                                         <button class="btn cancel-btn" data-event-id="<?php echo $event['id']; ?>">Отменить</button>
                                         <button class="btn certificate-btn" data-event-id="<?php echo $event['id']; ?>">Загрузить</button>
                                     </div>
-
                                 <?php else : ?>
                                     <button class="participate-btn" data-event-id="<?php echo $event['id']; ?>" <?php echo ($moderator_status != 1) ? 'disabled' : ''; ?>>Участвую</button>
                                 <?php endif; ?>
@@ -75,8 +89,6 @@ if ($participation_result && mysqli_num_rows($participation_result) > 0) {
         <?php endif; ?>
     </div>
 </div>
-
-
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -119,8 +131,6 @@ if ($participation_result && mysqli_num_rows($participation_result) > 0) {
         }
     });
 </script>
-
-
 
 <?php
 include_once "./base/footer.php";
