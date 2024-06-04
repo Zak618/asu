@@ -53,12 +53,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $sql = "UPDATE users SET balance = ? WHERE id = ?";
             $stmt = $conn->prepare($sql);
             $stmt->bind_param("ii", $new_balance, $user_id);
-            $stmt->execute();
+            
+            if ($stmt->execute()) {
+                echo json_encode(['success' => true, 'balance' => $new_balance]);
+            } else {
+                echo json_encode(['success' => false, 'error' => 'Ошибка при обновлении баланса: ' . $stmt->error]);
+            }
+        } else {
+            echo json_encode(['success' => true]);
         }
-
-        echo json_encode(['success' => true]);
     } else {
-        echo json_encode(['success' => false, 'error' => $stmt->error]);
+        echo json_encode(['success' => false, 'error' => 'Ошибка при обновлении сертификата: ' . $stmt->error]);
     }
 
     $stmt->close();
