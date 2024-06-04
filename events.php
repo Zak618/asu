@@ -76,7 +76,7 @@ if ($participation_result && mysqli_num_rows($participation_result) > 0) {
                                 <?php if (in_array($event['id'], $participated_events)) : ?>
                                     <div class="btn-group">
                                         <button class="btn cancel-btn" data-event-id="<?php echo $event['id']; ?>">Отменить</button>
-                                        <button class="btn certificate-btn" data-event-id="<?php echo $event['id']; ?>">Загрузить</button>
+                                        <a href="event.php?id=<?php echo $event['id']; ?>" class="btn certificate-btn">Подробнее</a>
                                     </div>
                                 <?php else : ?>
                                     <button class="btn participate-btn" data-event-id="<?php echo $event['id']; ?>">Участвую</button>

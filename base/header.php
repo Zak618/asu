@@ -8,6 +8,7 @@ session_start();
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
   <link rel="stylesheet" href="../css/start.css">
   <link rel="stylesheet" href="../css/profile.css">
   <link rel="stylesheet" href="../css/events.css">
@@ -29,7 +30,7 @@ session_start();
             <a class="nav-link px-2 link-dark" href="../events.php">Мероприятия</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link px-2 link-dark" href="#">Сертификаты</a>
+            <a class="nav-link px-2 link-dark" href="#">Маркет</a>
           </li>
         </ul>
         <ul class="navbar-nav d-lg-none w-100 justify-content-center">

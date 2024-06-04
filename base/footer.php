@@ -13,8 +13,8 @@
       </ul>
 
       <div class="col-12 col-md-4 d-flex justify-content-center justify-content-md-end">
-        <a href="#" class="me-3"><img src="vk-icon.png" alt="VK" width="32" height="32"></a>
-        <a href="#"><img src="another-icon.png" alt="Other" width="32" height="32"></a>
+        <a href="#" class="me-3"><img src="../images/baseImage/vk.png" alt="VK" width="32" height="32"></a>
+        <a href="#"><img src="../images/baseImage/website.png" alt="Other" width="32" height="32"></a>
       </div>
     </footer>
   </div>
