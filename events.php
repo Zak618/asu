@@ -79,7 +79,7 @@ if ($participation_result && mysqli_num_rows($participation_result) > 0) {
                                         <button class="btn certificate-btn" data-event-id="<?php echo $event['id']; ?>">Загрузить</button>
                                     </div>
                                 <?php else : ?>
-                                    <button class="participate-btn" data-event-id="<?php echo $event['id']; ?>" <?php echo ($moderator_status != 1) ? 'disabled' : ''; ?>>Участвую</button>
+                                    <button class="btn participate-btn" data-event-id="<?php echo $event['id']; ?>">Участвую</button>
                                 <?php endif; ?>
                             </div>
                         </div>
@@ -90,6 +90,26 @@ if ($participation_result && mysqli_num_rows($participation_result) > 0) {
     </div>
 </div>
 
+<!-- Модальное окно -->
+<div class="modal fade" id="moderatorModal" tabindex="-1" role="dialog" aria-labelledby="moderatorModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="moderatorModalLabel">Информация</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Закрыть">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                Ваши данные еще не проверены.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal">Ок</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const participateButtons = document.querySelectorAll('.participate-btn');
@@ -97,8 +117,12 @@ if ($participation_result && mysqli_num_rows($participation_result) > 0) {
 
         participateButtons.forEach(button => {
             button.addEventListener('click', function() {
-                const eventId = this.getAttribute('data-event-id');
-                handleParticipation(eventId, 'participate');
+                <?php if ($moderator_status != 1): ?>
+                    $('#moderatorModal').modal('show');
+                <?php else: ?>
+                    const eventId = this.getAttribute('data-event-id');
+                    handleParticipation(eventId, 'participate');
+                <?php endif; ?>
             });
         });
 
@@ -127,7 +151,8 @@ if ($participation_result && mysqli_num_rows($participation_result) > 0) {
                     } else {
                         alert('Произошла ошибка: ' + data.error);
                     }
-                });
+                })
+                .catch(error => console.error('Error:', error));
         }
     });
 </script>

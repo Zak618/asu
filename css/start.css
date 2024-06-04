@@ -1,34 +1,44 @@
+/* Общие стили */
 .container-custom {
     border-radius: 20px;
     padding: 20px;
-    background-color: #f8f9fa;
     padding-bottom: 0;
 }
+
 .event-card {
-    border-radius: 45px;
+    border-radius: 20px;
     background-color: #007bff;
     color: white;
     padding: 20px;
-    margin-bottom: 5px;
+    margin-bottom: 20px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     height: 250px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
 }
+
+.event-card:hover {
+    transform: translateY(-5px);
+}
+
 .event-card .btn {
     background-color: white;
     color: #007bff;
     border: none;
-    border-radius: 40px;
+    border-radius: 20px;
     padding: 10px 20px;
     font-size: 16px;
     transition: background-color 0.2s, color 0.2s;
 }
+
 .event-footer {
     display: flex;
     align-items: center;
     margin-top: auto;
 }
+
 .header-title, .badge-custom1 {
     background-color: #28a745;
     color: white;
@@ -54,3 +64,121 @@
     margin-right: 20px;
 }
 
+/* Карточка "Мои события" */
+.my-events-container {
+    border-radius: 20px;
+    background-color: #007bff;
+    color: white;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.my-events-container:hover {
+    transform: translateY(-5px);
+}
+
+.my-events-title {
+    color: white;
+    font-weight: bold;
+    text-transform: uppercase;
+    padding: 10px;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.my-events-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-height: 220px;
+    overflow-y: auto;
+}
+
+.event-item {
+    background-color: white;
+    color: #007bff;
+    border-radius: 20px;
+    padding: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+    margin-top: 10px;
+}
+
+.event-item:hover {
+    transform: translateY(-5px);
+}
+
+.btn-more {
+    background-color: white;
+    color: #007bff;
+    border-radius: 20px;
+    font-size: 16px;
+    padding: 10px 20px;
+    text-transform: uppercase;
+    font-weight: bold;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+}
+
+.btn-more:hover {
+    transform: translateY(-5px);
+}
+
+/* Карточка Telegram Bot */
+.telegram-bot-container {
+    border-radius: 20px;
+    background-color: #f8f9fa;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+    max-height: 400px;
+}
+
+.telegram-bot-container:hover {
+    transform: translateY(-5px);
+}
+
+.telegram-bot-title {
+    color: #007bff;
+    font-weight: bold;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+}
+
+.telegram-bot-content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+
+.telegram-bot-container .btn-primary {
+    border-radius: 20px;
+    background-color: #007bff;
+    border: none;
+    font-size: 16px;
+    padding: 10px 20px;
+    text-transform: uppercase;
+    font-weight: bold;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+}
+
+.telegram-bot-container .btn-primary:hover {
+    transform: translateY(-5px);
+}
+
+.telegram-bot-image {
+    max-width: 100px;
+    height: auto;
+    transition: transform 0.3s ease;
+}
+
+.telegram-bot-image:hover {
+    transform: scale(1.1);
+}
