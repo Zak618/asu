@@ -39,11 +39,36 @@ function getEvents($conn)
     return $events;
 }
 
+// Получение сертификатов по статусу
+function getCertificatesByStatus($status, $conn)
+{
+    $sql = "SELECT c.*, u.first_name, u.last_name, e.title as event_title 
+            FROM certificate c 
+            JOIN users u ON c.user_id = u.id 
+            JOIN event e ON c.event_id = e.id 
+            WHERE c.moderator_status = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("s", $status);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $certificates = [];
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $certificates[] = $row;
+        }
+    }
+    return $certificates;
+}
+
 $events = getEvents($conn);
 
 $newStudents = getStudentsByStatus(0, $conn);
 $acceptedStudents = getStudentsByStatus(1, $conn);
 $rejectedStudents = getStudentsByStatus(2, $conn);
+
+$pendingCertificates = getCertificatesByStatus('на рассмотрении', $conn);
+$acceptedCertificates = getCertificatesByStatus('принято', $conn);
+$rejectedCertificates = getCertificatesByStatus('отклонено', $conn);
 
 ?>
 
@@ -77,6 +102,9 @@ $rejectedStudents = getStudentsByStatus(2, $conn);
             </li>
             <li class="nav-item">
                 <a class="nav-link" id="rejected-tab" data-toggle="tab" href="#rejected" role="tab" aria-controls="rejected" aria-selected="false">Отклоненные</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="certificates-tab" data-toggle="tab" href="#certificates" role="tab" aria-controls="certificates" aria-selected="false">Сертификаты</a>
             </li>
         </ul>
         <div class="tab-content" id="studentTabsContent">
@@ -170,6 +198,94 @@ $rejectedStudents = getStudentsByStatus(2, $conn);
                             </div>
                         </div>
                     <?php endforeach; ?>
+                </div>
+            </div>
+            <!-- Модальное окно для показа сертификата -->
+<div class="modal fade" id="viewCertificateModal" tabindex="-1" aria-labelledby="viewCertificateModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="viewCertificateModalLabel">Сертификат</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Закрыть">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body text-center">
+                <img id="certificateImage" src="" alt="Сертификат" class="img-fluid">
+            </div>
+        </div>
+    </div>
+</div>
+
+            <!-- Сертификаты -->
+            <div class="tab-pane fade" id="certificates" role="tabpanel" aria-labelledby="certificates-tab">
+                <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active" id="pills-pending-tab" data-toggle="pill" href="#pills-pending" role="tab" aria-controls="pills-pending" aria-selected="true">На рассмотрении</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="pills-accepted-tab" data-toggle="pill" href="#pills-accepted" role="tab" aria-controls="pills-accepted" aria-selected="false">Принятые</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="pills-rejected-tab" data-toggle="pill" href="#pills-rejected" role="tab" aria-controls="pills-rejected" aria-selected="false">Отклоненные</a>
+                    </li>
+                </ul>
+                <div class="tab-content" id="pills-tabContent">
+                    <div class="tab-pane fade show active" id="pills-pending" role="tabpanel" aria-labelledby="pills-pending-tab">
+                        <div class="row mt-3">
+                            <?php foreach ($pendingCertificates as $certificate) : ?>
+                                <div class="col-md-6 col-lg-4">
+                                    <div class="card mb-4">
+                                        <div class="card-body">
+                                            <h5 class="card-title"><?php echo htmlspecialchars($certificate['first_name'] . ' ' . $certificate['last_name']); ?></h5>
+                                            <p class="card-text">Мероприятие: <?php echo htmlspecialchars($certificate['event_title']); ?></p>
+                                            <p class="card-text">Место: <?php echo htmlspecialchars($certificate['place']); ?></p>
+                                            <p class="card-text">Дата загрузки: <?php echo htmlspecialchars($certificate['upload_date']); ?></p>
+                                            <button class="btn btn-primary btn-sm view-certificate-btn" data-file-path="<?php echo htmlspecialchars($certificate['file_path']); ?>">Показать сертификат</button>
+                                            <button class="btn btn-success btn-sm accept-certificate-btn" data-id="<?php echo $certificate['id']; ?>">Принять</button>
+                                            <button class="btn btn-danger btn-sm reject-certificate-btn" data-id="<?php echo $certificate['id']; ?>">Отклонить</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="pills-accepted" role="tabpanel" aria-labelledby="pills-accepted-tab">
+                        <div class="row mt-3">
+                            <?php foreach ($acceptedCertificates as $certificate) : ?>
+                                <div class="col-md-6 col-lg-4">
+                                    <div class="card mb-4">
+                                        <div class="card-body">
+                                            <h5 class="card-title"><?php echo htmlspecialchars($certificate['first_name'] . ' ' . $certificate['last_name']); ?></h5>
+                                            <p class="card-text">Мероприятие: <?php echo htmlspecialchars($certificate['event_title']); ?></p>
+                                            <p class="card-text">Место: <?php echo htmlspecialchars($certificate['place']); ?></p>
+                                            <p class="card-text">Дата загрузки: <?php echo htmlspecialchars($certificate['upload_date']); ?></p>
+                                            <button class="btn btn-primary btn-sm view-certificate-btn" data-file-path="<?php echo htmlspecialchars($certificate['file_path']); ?>">Показать сертификат</button>
+                                            <p class="card-text">Начислено баллов: <?php echo htmlspecialchars($certificate['points_awarded']); ?></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="pills-rejected" role="tabpanel" aria-labelledby="pills-rejected-tab">
+                        <div class="row mt-3">
+                            <?php foreach ($rejectedCertificates as $certificate) : ?>
+                                <div class="col-md-6 col-lg-4">
+                                    <div class="card mb-4">
+                                        <div class="card-body">
+                                            <h5 class="card-title"><?php echo htmlspecialchars($certificate['first_name'] . ' ' . $certificate['last_name']); ?></h5>
+                                            <p class="card-text">Мероприятие: <?php echo htmlspecialchars($certificate['event_title']); ?></p>
+                                            <p class="card-text">Место: <?php echo htmlspecialchars($certificate['place']); ?></p>
+                                            <p class="card-text">Дата загрузки: <?php echo htmlspecialchars($certificate['upload_date']); ?></p>
+                                            <button class="btn btn-primary btn-sm view-certificate-btn" data-file-path="<?php echo htmlspecialchars($certificate['file_path']); ?>">Показать сертификат</button>
+                                            <p class="card-text">Причина отклонения: <?php echo htmlspecialchars($certificate['moderator_comment']); ?></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -383,153 +499,181 @@ $rejectedStudents = getStudentsByStatus(2, $conn);
             </div>
         </div>
     </div>
+                                <!-- Модальное окно для причины отклонения сертификата -->
+<div class="modal fade" id="rejectModal" tabindex="-1" aria-labelledby="rejectModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="rejectModalLabel">Причина отклонения</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="rejectForm">
+                    <div class="mb-3">
+                        <label for="rejectComment" class="form-label">Комментарий</label>
+                        <textarea class="form-control" id="rejectComment" name="comment" required></textarea>
+                    </div>
+                    <input type="hidden" id="rejectCertificateId" name="certificate_id">
+                    <button type="submit" class="btn btn-primary">Отправить</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
     <script>
-        $(document).ready(function() {
-            // Добавление мероприятия
-            $('#addEventForm').submit(function(e) {
-                e.preventDefault();
-                $.post('./database/add_event.php', $(this).serialize(), function(response) {
-                    $('#addEventModal').modal('hide');
-                    location.reload();
-                });
-            });
+$(document).ready(function() {
+    // Показ изображения сертификата
+    $('.view-certificate-btn').click(function() {
+        var filePath = $(this).data('file-path');
+        $('#certificateImage').attr('src', filePath);
+        $('#viewCertificateModal').modal('show');
+    });
 
-            // Редактирование мероприятия
-            $('.edit-btn').click(function() {
-                var eventId = $(this).data('id');
-                $.get('./database/get_event.php', {
-                    id: eventId
-                }, function(data) {
-                    var event = JSON.parse(data);
-                    $('#editEventId').val(event.id);
-                    $('#editEventTitle').val(event.title);
-                    $('#editEventDescription').val(event.description);
-                    $('#editEventStartDate').val(event.start_date.replace(' ', 'T'));
-                    $('#editEventEndDate').val(event.end_date.replace(' ', 'T'));
-                    $('#editEventUrl').val(event.event_url);
-                    $('#editEventType').val(event.event_type);
-                    $('#editEventLevel').val(event.event_level);
-                    $('#editPointsWinner').val(event.points_winner);
-                    $('#editPointsPrize').val(event.points_prize);
-                    $('#editPointsParticipant').val(event.points_participant);
-                    $('#editEventModal').modal('show');
-
-                    // Показать поле "Другое" для типа мероприятия, если выбрано "Другое"
-                    if (event.event_type === 'Другое') {
-                        $('#editEventTypeOther').val(event.event_type).show();
-                    } else {
-                        $('#editEventTypeOther').hide();
-                    }
-
-                    // Показать поле "Другое" для уровня мероприятия, если выбрано "Другое"
-                    if (event.event_level === 'Другое') {
-                        $('#editEventLevelOther').val(event.event_level).show();
-                    } else {
-                        $('#editEventLevelOther').hide();
-                    }
-                });
-            });
-
-            $('#editEventForm').submit(function(e) {
-                e.preventDefault();
-                $.post('./database/edit_event.php', $(this).serialize(), function(response) {
-                    $('#editEventModal').modal('hide');
-                    location.reload();
-                });
-            });
-
-            // Удаление мероприятия
-            $('.delete-btn').click(function() {
-                if (confirm('Вы уверены, что хотите удалить это мероприятие?')) {
-                    var eventId = $(this).data('id');
-                    $.post('./database/delete_event.php', {
-                        id: eventId
-                    }, function(response) {
-                        location.reload();
-                    });
-                }
-            });
-
-            // Показать/скрыть поле "Другое" для типа мероприятия
-            $('#eventType').change(function() {
-                if ($(this).val() === 'Другое') {
-                    $('#eventTypeOther').show();
-                } else {
-                    $('#eventTypeOther').hide();
-                }
-            });
-
-            // Показать/скрыть поле "Другое" для уровня мероприятия
-            $('#eventLevel').change(function() {
-                if ($(this).val() === 'Другое') {
-                    $('#eventLevelOther').show();
-                } else {
-                    $('#eventLevelOther').hide();
-                }
-            });
-
-            // Показать/скрыть поле "Другое" для редактирования типа мероприятия
-            $('#editEventType').change(function() {
-                if ($(this).val() === 'Другое') {
-                    $('#editEventTypeOther').show();
-                } else {
-                    $('#editEventTypeOther').hide();
-                }
-            });
-
-            // Показать/скрыть поле "Другое" для редактирования уровня мероприятия
-            $('#editEventLevel').change(function() {
-                if ($(this).val() === 'Другое') {
-                    $('#editEventLevelOther').show();
-                } else {
-                    $('#editEventLevelOther').hide();
-                }
-            });
-
-            $('.accept-btn').click(function() {
-                var studentId = $(this).data('id');
-                $('#acceptStudentId').val(studentId);
-                $('#acceptModal').modal('show');
-            });
-
-            $('.reject-btn').click(function() {
-                var studentId = $(this).data('id');
-                $('#rejectStudentId').val(studentId);
-                $('#rejectModal').modal('show');
-            });
-
-            $('#rejectForm').submit(function(e) {
-                e.preventDefault();
-                $.post('../database/update_student_status.php', {
-                    student_id: $('#rejectStudentId').val(),
-                    status: 2,
-                    comment: $('#rejectComment').val()
-                }, function(response) {
-                    $('#rejectModal').modal('hide');
-                    location.reload();
-                });
-            });
-
-            $('#acceptForm').submit(function(e) {
-                e.preventDefault();
-                $.post('../database/update_student_status.php', {
-                    student_id: $('#acceptStudentId').val(),
-                    status: 1,
-                    direction_code: $('#directionCode').val(),
-                    direction_name: $('#directionName').val(),
-                    profile: $('#profile').val()
-                }, function(response) {
-                    $('#acceptModal').modal('hide');
-                    location.reload();
-                });
-            });
+    // Добавление мероприятия
+    $('#addEventForm').submit(function(e) {
+        e.preventDefault();
+        $.post('./database/add_event.php', $(this).serialize(), function(response) {
+            $('#addEventModal').modal('hide');
+            location.reload();
         });
-    </script>
+    });
+
+    // Редактирование мероприятия
+    $('.edit-btn').click(function() {
+        var eventId = $(this).data('id');
+        $.get('./database/get_event.php', {
+            id: eventId
+        }, function(data) {
+            var event = JSON.parse(data);
+            $('#editEventId').val(event.id);
+            $('#editEventTitle').val(event.title);
+            $('#editEventDescription').val(event.description);
+            $('#editEventStartDate').val(event.start_date.replace(' ', 'T'));
+            $('#editEventEndDate').val(event.end_date.replace(' ', 'T'));
+            $('#editEventUrl').val(event.event_url);
+            $('#editEventType').val(event.event_type);
+            $('#editEventLevel').val(event.event_level);
+            $('#editPointsWinner').val(event.points_winner);
+            $('#editPointsPrize').val(event.points_prize);
+            $('#editPointsParticipant').val(event.points_participant);
+            $('#editEventModal').modal('show');
+
+            // Показать поле "Другое" для типа мероприятия, если выбрано "Другое"
+            if (event.event_type === 'Другое') {
+                $('#editEventTypeOther').val(event.event_type).show();
+            } else {
+                $('#editEventTypeOther').hide();
+            }
+
+            // Показать поле "Другое" для уровня мероприятия, если выбрано "Другое"
+            if (event.event_level === 'Другое') {
+                $('#editEventLevelOther').val(event.event_level).show();
+            } else {
+                $('#editEventLevelOther').hide();
+            }
+        });
+    });
+
+    $('#editEventForm').submit(function(e) {
+        e.preventDefault();
+        $.post('./database/edit_event.php', $(this).serialize(), function(response) {
+            $('#editEventModal').modal('hide');
+            location.reload();
+        });
+    });
+
+    // Удаление мероприятия
+    $('.delete-btn').click(function() {
+        if (confirm('Вы уверены, что хотите удалить это мероприятие?')) {
+            var eventId = $(this).data('id');
+            $.post('./database/delete_event.php', {
+                id: eventId
+            }, function(response) {
+                location.reload();
+            });
+        }
+    });
+
+    // Показать/скрыть поле "Другое" для типа мероприятия
+    $('#eventType').change(function() {
+        if ($(this).val() === 'Другое') {
+            $('#eventTypeOther').show();
+        } else {
+            $('#eventTypeOther').hide();
+        }
+    });
+
+    // Показать/скрыть поле "Другое" для уровня мероприятия
+    $('#eventLevel').change(function() {
+        if ($(this).val() === 'Другое') {
+            $('#eventLevelOther').show();
+        } else {
+            $('#eventLevelOther').hide();
+        }
+    });
+
+    // Показать/скрыть поле "Другое" для редактирования типа мероприятия
+    $('#editEventType').change(function() {
+        if ($(this).val() === 'Другое') {
+            $('#editEventTypeOther').show();
+        } else {
+            $('#editEventTypeOther').hide();
+        }
+    });
+
+    // Показать/скрыть поле "Другое" для редактирования уровня мероприятия
+    $('#editEventLevel').change(function() {
+        if ($(this).val() === 'Другое') {
+            $('#editEventLevelOther').show();
+        } else {
+            $('#editEventLevelOther').hide();
+        }
+    });
+
+    $('.accept-certificate-btn').click(function() {
+        var certificateId = $(this).data('id');
+        updateCertificateStatus(certificateId, 'принято');
+    });
+
+    $('.reject-certificate-btn').click(function() {
+        var certificateId = $(this).data('id');
+        $('#rejectCertificateId').val(certificateId);
+        $('#rejectModal').modal('show');
+    });
+
+    $('#rejectForm').submit(function(e) {
+        e.preventDefault();
+        var certificateId = $('#rejectCertificateId').val();
+        var comment = $('#rejectComment').val();
+        updateCertificateStatus(certificateId, 'отклонено', comment);
+    });
+
+    function updateCertificateStatus(certificateId, status, comment = '') {
+        $.post('./database/update_certificate_status.php', {
+            certificate_id: certificateId,
+            status: status,
+            comment: comment
+        }, function(response) {
+            if (response.success) {
+                location.reload();
+            } else {
+                alert('Произошла ошибка: ' + response.error);
+            }
+        }, 'json');
+    }
+});
+</script>
+
+</script>
+
+
 
 </body>
 

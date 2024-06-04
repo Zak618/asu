@@ -84,8 +84,10 @@ $certificate = mysqli_fetch_assoc($certificate_result);
                             <?php if ($certificate['moderator_status'] == 'принято') : ?>
                                 <p class="mr-2"><i class="fas fa-check-circle"></i> Статус: Принято. Начислено баллов: <?php echo htmlspecialchars($certificate['points_awarded']); ?></p>
                             <?php elseif ($certificate['moderator_status'] == 'отклонено') : ?>
-                                <p class="mr-2"><i class="fas fa-times-circle"></i> Статус: Отклонено. Причина: <?php echo htmlspecialchars($certificate['moderator_comment']); ?></p>
-                                <button class="btn btn-danger delete-certificate-btn m-2" data-certificate-id="<?php echo $certificate['id']; ?>"><i class="fas fa-trash-alt"></i> Удалить сертификат</button>
+                                <div class="d-flex align-items-center">
+                                    <p class="mr-2"><i class="fas fa-times-circle"></i> Статус: Отклонено. Причина: <?php echo htmlspecialchars($certificate['moderator_comment']); ?></p>
+                                    <button class="btn btn-danger delete-certificate-btn m-2" data-certificate-id="<?php echo $certificate['id']; ?>"><i class="fas fa-trash-alt"></i> Удалить сертификат</button>
+                                </div>
                             <?php else : ?>
                                 <div class="d-flex align-items-center">
                                     <p class="mr-2 mb-0"><i class="fas fa-hourglass-half"></i> Статус: На рассмотрении</p>
