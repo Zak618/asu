@@ -11,7 +11,7 @@ if (!isset($_SESSION['moderator_id'])) {
 // Получение списка студентов по статусу
 function getStudentsByStatus($status, $conn)
 {
-    $sql = "SELECT * FROM students WHERE moderator_status = ?";
+    $sql = "SELECT * FROM users WHERE moderator_status = ?";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("i", $status);
     $stmt->execute();

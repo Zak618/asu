@@ -14,6 +14,9 @@ if ($result && mysqli_num_rows($result) > 0) {
     }
 }
 
+
+$moderator_status = $_SESSION['moderator_status']; // Статус модератора из сессии
+
 $student_id = $_SESSION['user_id']; // Идентификатор студента из сессии
 $participation_sql = "SELECT event_id FROM event_participation WHERE student_id = $student_id";
 $participation_result = mysqli_query($conn, $participation_sql);
@@ -62,7 +65,7 @@ if ($participation_result && mysqli_num_rows($participation_result) > 0) {
                                     </div>
 
                                 <?php else : ?>
-                                    <button class="participate-btn" data-event-id="<?php echo $event['id']; ?>">Участвую</button>
+                                    <button class="participate-btn" data-event-id="<?php echo $event['id']; ?>" <?php echo ($moderator_status != 1) ? 'disabled' : ''; ?>>Участвую</button>
                                 <?php endif; ?>
                             </div>
                         </div>
@@ -72,6 +75,9 @@ if ($participation_result && mysqli_num_rows($participation_result) > 0) {
         <?php endif; ?>
     </div>
 </div>
+
+
+
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const participateButtons = document.querySelectorAll('.participate-btn');

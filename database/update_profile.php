@@ -18,7 +18,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     }
 
-    $sql = "UPDATE students SET first_name = ?, last_name = ?, email = ?, phone_number = ?, group_name = ?, avatar_url = ?, moderator_status = 0 WHERE id = ?";
+    $sql = "UPDATE users SET first_name = ?, last_name = ?, email = ?, phone_number = ?, group_name = ?, avatar_url = ?, moderator_status = 0 WHERE id = ?";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("ssssssi", $firstName, $lastName, $email, $phoneNumber, $groupName, $avatarUrl, $_SESSION['user_id']);
 

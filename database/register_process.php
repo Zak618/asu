@@ -14,7 +14,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $seed = urlencode($firstName . ' ' . $lastName);
     $avatarUrl = "https://api.dicebear.com/8.x/initials/svg?seed=$seed&radius=50";
 
-    $sql = "INSERT INTO students (first_name, last_name, middle_name, group_name, email, phone_number, password, avatar_url)
+    $sql = "INSERT INTO users (first_name, last_name, middle_name, group_name, email, phone_number, password, avatar_url)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
     $stmt = $conn->prepare($sql);

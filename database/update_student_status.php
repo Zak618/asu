@@ -10,11 +10,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $profile = isset($_POST['profile']) ? $_POST['profile'] : '';
 
     if ($status == 1) {
-        $sql = "UPDATE students SET moderator_status = ?, direction_code = ?, direction_name = ?, profile = ? WHERE id = ?";
+        $sql = "UPDATE users SET moderator_status = ?, direction_code = ?, direction_name = ?, profile = ? WHERE id = ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("isssi", $status, $direction_code, $direction_name, $profile, $student_id);
     } else {
-        $sql = "UPDATE students SET moderator_status = ?, moderator_comment = ? WHERE id = ?";
+        $sql = "UPDATE users SET moderator_status = ?, moderator_comment = ? WHERE id = ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("isi", $status, $comment, $student_id);
     }
