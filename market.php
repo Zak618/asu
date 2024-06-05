@@ -5,6 +5,8 @@ if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
     exit();
 }
+
+$user_id = $_SESSION['user_id'];
 ?>
 
 <h2 class="text-center mb-4"><span style="color: #ffcc00;">М</span>аркет</h2>
@@ -32,7 +34,9 @@ if (!isset($_SESSION['user_id'])) {
             <!-- История обмена -->
         </div>
         <div class="tab-pane fade" id="my-certificates" role="tabpanel" aria-labelledby="my-certificates-tab">
-            <!-- Мои купоны -->
+            <div class="card-container" id="myCertificatesList">
+                <!-- Мои сертификаты будут загружены здесь -->
+            </div>
         </div>
     </div>
 </div>
@@ -59,13 +63,38 @@ if (!isset($_SESSION['user_id'])) {
     </div>
 </div>
 
+<!-- Модальное окно для активации купона -->
+<div class="modal fade" id="activateModal" tabindex="-1" aria-labelledby="activateModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="activateModalLabel">Активация купона</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Выберите преподавателя для активации купона:</p>
+                <select id="teacherSelect" class="form-control">
+                    <!-- Преподаватели будут загружены здесь -->
+                </select>
+                <input type="hidden" id="couponId">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Отмена</button>
+                <button type="button" class="btn btn-warning" id="confirmActivateBtn">Активировать</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
 <script>
     $(document).ready(function() {
-        // Загрузка сертификатов из базы данных
+        // Загрузка всех сертификатов
         $.ajax({
             url: './database/get_certificates.php',
             method: 'GET',
@@ -85,13 +114,64 @@ if (!isset($_SESSION['user_id'])) {
 
                 // Добавить обработчик события на кнопки с ценой
                 $('.price-button').click(function() {
-                    const itemId = $(this).attr('data-id');
+                    const itemId = $(this).data('id');
                     $('#itemId').val(itemId);
                     $('#purchaseModal').modal('show');
                 });
             },
             error: function(err) {
                 console.error('Error loading certificates:', err);
+            }
+        });
+
+        // Загрузка сертификатов пользователя
+        $.ajax({
+            url: './database/get_my_certificates.php',
+            method: 'GET',
+            data: { user_id: <?php echo $user_id; ?> },
+            success: function(data) {
+                const myCertificates = JSON.parse(data);
+                myCertificates.forEach(cert => {
+                    const isActive = cert.status === 'активно';
+                    const cardClass = isActive ? 'certificate-card' : 'certificate-card inactive';
+                    const button = isActive ? `<button class="btn btn-warning activate-button" data-coupon-id="${cert.coupon_id}">Активировать</button>` : '<span class="activated-text">Активирован</span>';
+                    
+                    $('#myCertificatesList').append(`
+                        <div class="${cardClass} ${cert.color_class}">
+                            <div>${cert.item_name}</div>
+                            <div class="dashed-line"></div>
+                            <div class="price-button-wrapper">
+                                ${button}
+                            </div>
+                        </div>
+                    `);
+                });
+
+                // Добавить обработчик события на кнопки активации
+                $('.activate-button').click(function() {
+                    const couponId = $(this).data('coupon-id');
+                    $('#couponId').val(couponId);
+                    
+                    // Загрузка преподавателей
+                    $.ajax({
+                        url: './database/fetch_teachers.php',
+                        method: 'GET',
+                        success: function(data) {
+                            const teachers = JSON.parse(data);
+                            $('#teacherSelect').empty();
+                            teachers.forEach(teacher => {
+                                $('#teacherSelect').append(`<option value="${teacher.id}">${teacher.first_name} ${teacher.last_name}</option>`);
+                            });
+                            $('#activateModal').modal('show');
+                        },
+                        error: function(err) {
+                            console.error('Error loading teachers:', err);
+                        }
+                    });
+                });
+            },
+            error: function(err) {
+                console.error('Error loading my certificates:', err);
             }
         });
 
@@ -108,6 +188,8 @@ if (!isset($_SESSION['user_id'])) {
                         $('#purchaseModal').modal('hide');
                         alert('Купон успешно приобретен!');
                         updateBalance(result.new_balance);
+                        // Перезагрузите список сертификатов
+                        loadMyCertificates();
                     } else {
                         alert('Ошибка при покупке купона: ' + result.message);
                     }
@@ -119,11 +201,93 @@ if (!isset($_SESSION['user_id'])) {
             });
         });
 
+        // Обработка подтверждения активации
+        $('#confirmActivateBtn').click(function() {
+            const couponId = $('#couponId').val();
+            const teacherId = $('#teacherSelect').val();
+            $.ajax({
+                url: './database/activate_certificate.php',
+                method: 'POST',
+                data: { coupon_id: couponId, teacher_id: teacherId },
+                success: function(response) {
+                    const result = JSON.parse(response);
+                    if (result.success) {
+                        $('#activateModal').modal('hide');
+                        alert('Купон успешно активирован!');
+                        // Перезагрузите список сертификатов
+                        loadMyCertificates();
+                    } else {
+                        alert('Ошибка при активации купона: ' + result.message);
+                    }
+                },
+                error: function(err) {
+                    console.error('Error activating certificate:', err);
+                    alert('Произошла ошибка при активации купона.');
+                }
+            });
+        });
+
+        // Функция для загрузки сертификатов пользователя
+        function loadMyCertificates() {
+            $.ajax({
+                url: './database/get_my_certificates.php',
+                method: 'GET',
+                data: { user_id: <?php echo $user_id; ?> },
+                success: function(data) {
+                    const myCertificates = JSON.parse(data);
+                    $('#myCertificatesList').empty();
+                    myCertificates.forEach(cert => {
+                        const isActive = cert.status === 'активно';
+                        const cardClass = isActive ? 'certificate-card' : 'certificate-card inactive';
+                        const button = isActive ? `<button class="btn btn-warning activate-button" data-coupon-id="${cert.coupon_id}">Активировать</button>` : '<span class="activated-text">Активирован</span>';
+                        
+                        $('#myCertificatesList').append(`
+                            <div class="${cardClass} ${cert.color_class}">
+                                <div>${cert.item_name}</div>
+                                <div class="dashed-line"></div>
+                                <div class="price-button-wrapper">
+                                    ${button}
+                                </div>
+                            </div>
+                        `);
+                    });
+
+                    // Добавить обработчик события на кнопки активации
+                    $('.activate-button').click(function() {
+                        const couponId = $(this).data('coupon-id');
+                        $('#couponId').val(couponId);
+                        
+                        // Загрузка преподавателей
+                        $.ajax({
+                            url: './database/fetch_teachers.php',
+                            method: 'GET',
+                            success: function(data) {
+                                const teachers = JSON.parse(data);
+                                $('#teacherSelect').empty();
+                                teachers.forEach(teacher => {
+                                    $('#teacherSelect').append(`<option value="${teacher.id}">${teacher.first_name} ${teacher.last_name}</option>`);
+                                });
+                                $('#activateModal').modal('show');
+                            },
+                            error: function(err) {
+                                console.error('Error loading teachers:', err);
+                            }
+                        });
+                    });
+                },
+                error: function(err) {
+                    console.error('Error loading my certificates:', err);
+                }
+            });
+        }
+
+        // Изначальная загрузка сертификатов пользователя
+        loadMyCertificates();
+
         function updateBalance(newBalance) {
             $('.balance-text').text(newBalance);
         }
     });
-    
 </script>
 
 <?php
