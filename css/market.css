@@ -97,3 +97,78 @@
 .price-button-wrapper {
     margin-top: auto;
 }
+.exchange-card {
+    border-radius: 15px;
+    padding: 20px;
+    margin: 20px 0;
+    background-color: #ffffff;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+    border-left: 6px solid #ffcc00;
+    transition: transform 0.3s, box-shadow 0.3s;
+    position: relative;
+    overflow: hidden;
+    min-height: 150px; /* Добавлено для фиксированной высоты */
+}
+
+.exchange-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+.exchange-card h5 {
+    margin: 0 0 10px 0;
+    font-size: 1.4em;
+    color: #333;
+    display: flex;
+    align-items: center;
+}
+
+.exchange-card p {
+    margin: 5px 0;
+    color: #666;
+    font-size: 1em;
+}
+
+.exchange-card .date {
+    color: #888;
+    font-size: 0.9em;
+}
+
+.exchange-card .badge-custom {
+    background-color: #ffcc00;
+    color: #fff;
+    border-radius: 5px;
+    padding: 7px 12px;
+    font-size: 0.9em;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+    display: inline-block;
+    margin-top: 10px; /* Добавлено для отступа сверху */
+}
+
+.exchange-card .operation-type {
+    background-color: #f0f0f0;
+    border-radius: 8px;
+    padding: 10px;
+    margin-top: 15px;
+    display: inline-block;
+    font-size: 1em;
+    color: #444;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.05);
+}
+
+.exchange-card .icon {
+    margin-right: 10px;
+    font-size: 1.2em;
+    color: #ffcc00;
+}
+
+.inactive {
+    background-color: #f9f9f9;
+    color: #ccc;
+    border-left: 6px solid #ccc;
+}
+
+.inactive .badge-custom, .inactive .operation-type, .inactive .icon {
+    background-color: #e0e0e0;
+    color: #aaa;
+}

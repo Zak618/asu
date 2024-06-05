@@ -31,8 +31,11 @@ $user_id = $_SESSION['user_id'];
             </div>
         </div>
         <div class="tab-pane fade" id="exchange-history" role="tabpanel" aria-labelledby="exchange-history-tab">
-            <!-- История обмена -->
+            <div class="card-container" id="exchangeHistoryList">
+                <!-- История обмена будет загружена здесь -->
+            </div>
         </div>
+
         <div class="tab-pane fade" id="my-certificates" role="tabpanel" aria-labelledby="my-certificates-tab">
             <div class="card-container" id="myCertificatesList">
                 <!-- Мои сертификаты будут загружены здесь -->
@@ -128,14 +131,16 @@ $user_id = $_SESSION['user_id'];
         $.ajax({
             url: './database/get_my_certificates.php',
             method: 'GET',
-            data: { user_id: <?php echo $user_id; ?> },
+            data: {
+                user_id: <?php echo $user_id; ?>
+            },
             success: function(data) {
                 const myCertificates = JSON.parse(data);
                 myCertificates.forEach(cert => {
                     const isActive = cert.status === 'активно';
                     const cardClass = isActive ? 'certificate-card' : 'certificate-card inactive';
                     const button = isActive ? `<button class="btn btn-warning activate-button" data-coupon-id="${cert.coupon_id}">Активировать</button>` : '<span class="activated-text">Активирован</span>';
-                    
+
                     $('#myCertificatesList').append(`
                         <div class="${cardClass} ${cert.color_class}">
                             <div>${cert.item_name}</div>
@@ -151,7 +156,7 @@ $user_id = $_SESSION['user_id'];
                 $('.activate-button').click(function() {
                     const couponId = $(this).data('coupon-id');
                     $('#couponId').val(couponId);
-                    
+
                     // Загрузка преподавателей
                     $.ajax({
                         url: './database/fetch_teachers.php',
@@ -181,7 +186,9 @@ $user_id = $_SESSION['user_id'];
             $.ajax({
                 url: './database/add_purchase.php',
                 method: 'POST',
-                data: { item_id: itemId },
+                data: {
+                    item_id: itemId
+                },
                 success: function(response) {
                     const result = JSON.parse(response);
                     if (result.success) {
@@ -201,6 +208,42 @@ $user_id = $_SESSION['user_id'];
             });
         });
 
+        // Функция для форматирования даты на русский
+        function formatDateTime(dateString) {
+            const date = new Date(dateString);
+    date.setHours(date.getHours() + 3); // Добавляем 3 часа для московского времени
+    const options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+    return date.toLocaleDateString('ru-RU', options);
+}
+
+
+    // Загрузка истории обмена
+    $.ajax({
+        url: './database/fetch_exchange_history.php',
+        method: 'GET',
+        data: { user_id: <?php echo $user_id; ?> },
+        success: function(data) {
+            const exchangeHistory = JSON.parse(data);
+            exchangeHistory.forEach(entry => {
+                const operationType = entry.teacher_name 
+                    ? `<i class="icon fas fa-check-circle"></i>Активировано у: ${entry.teacher_name}` 
+                    : `<i class="icon fas fa-shopping-cart"></i>Куплено`;
+                const cardClass = entry.status === 'активно' ? 'exchange-card' : 'exchange-card inactive';
+                
+                $('#exchangeHistoryList').append(`
+                    <div class="${cardClass}">
+                        <h5><i class="icon fas fa-ticket-alt"></i>${entry.item_name}</h5>
+                        <p class="date">Дата и время: ${formatDateTime(entry.purchase_date)}</p>
+                        <span class="badge-custom">${entry.status}</span>
+                        <p class="operation-type">${operationType}</p>
+                    </div>
+                `);
+            });
+        },
+        error: function(err) {
+            console.error('Error loading exchange history:', err);
+        }
+    });
         // Обработка подтверждения активации
         $('#confirmActivateBtn').click(function() {
             const couponId = $('#couponId').val();
@@ -208,7 +251,10 @@ $user_id = $_SESSION['user_id'];
             $.ajax({
                 url: './database/activate_certificate.php',
                 method: 'POST',
-                data: { coupon_id: couponId, teacher_id: teacherId },
+                data: {
+                    coupon_id: couponId,
+                    teacher_id: teacherId
+                },
                 success: function(response) {
                     const result = JSON.parse(response);
                     if (result.success) {
@@ -232,7 +278,9 @@ $user_id = $_SESSION['user_id'];
             $.ajax({
                 url: './database/get_my_certificates.php',
                 method: 'GET',
-                data: { user_id: <?php echo $user_id; ?> },
+                data: {
+                    user_id: <?php echo $user_id; ?>
+                },
                 success: function(data) {
                     const myCertificates = JSON.parse(data);
                     $('#myCertificatesList').empty();
@@ -240,7 +288,7 @@ $user_id = $_SESSION['user_id'];
                         const isActive = cert.status === 'активно';
                         const cardClass = isActive ? 'certificate-card' : 'certificate-card inactive';
                         const button = isActive ? `<button class="btn btn-warning activate-button" data-coupon-id="${cert.coupon_id}">Активировать</button>` : '<span class="activated-text">Активирован</span>';
-                        
+
                         $('#myCertificatesList').append(`
                             <div class="${cardClass} ${cert.color_class}">
                                 <div>${cert.item_name}</div>
@@ -256,7 +304,7 @@ $user_id = $_SESSION['user_id'];
                     $('.activate-button').click(function() {
                         const couponId = $(this).data('coupon-id');
                         $('#couponId').val(couponId);
-                        
+
                         // Загрузка преподавателей
                         $.ajax({
                             url: './database/fetch_teachers.php',
