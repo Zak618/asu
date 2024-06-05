@@ -167,8 +167,8 @@ $rejectedCertificates = getCertificatesByStatus('отклонено', $conn);
                 <a class="nav-link" id="market-tab" data-toggle="tab" href="#market" role="tab" aria-controls="market" aria-selected="false">Маркет</a>
             </li>
             <li class="nav-item">
-    <a class="nav-link" id="teachers-tab" data-toggle="tab" href="#teachers" role="tab" aria-controls="teachers" aria-selected="false">Преподаватели</a>
-</li>
+                <a class="nav-link" id="teachers-tab" data-toggle="tab" href="#teachers" role="tab" aria-controls="teachers" aria-selected="false">Преподаватели</a>
+            </li>
 
         </ul>
         <div class="tab-content" id="studentTabsContent">
@@ -208,117 +208,117 @@ $rejectedCertificates = getCertificatesByStatus('отклонено', $conn);
                 </div>
             </div>
             <div class="tab-pane fade" id="teachers" role="tabpanel" aria-labelledby="teachers-tab">
-    <div class="row mt-3">
-        <div class="col-12 text-right">
-            <button class="btn btn-primary mb-3" data-toggle="modal" data-target="#addTeacherModal">Добавить преподавателя</button>
-        </div>
-        <div class="col-12">
-            <div class="table-responsive">
-                <table class="table table-bordered">
-                    <thead>
-                        <tr>
-                            <th>Имя</th>
-                            <th>Фамилия</th>
-                            <th>Отчество</th>
-                            <th>Email</th>
-                            <th>Телефон</th>
-                            <th>Действия</th>
-                        </tr>
-                    </thead>
-                    <tbody id="teachersList">
-                        <!-- Преподаватели будут загружены через AJAX -->
-                    </tbody>
-                </table>
+                <div class="row mt-3">
+                    <div class="col-12 text-right">
+                        <button class="btn btn-primary mb-3" data-toggle="modal" data-target="#addTeacherModal">Добавить преподавателя</button>
+                    </div>
+                    <div class="col-12">
+                        <div class="table-responsive">
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Имя</th>
+                                        <th>Фамилия</th>
+                                        <th>Отчество</th>
+                                        <th>Email</th>
+                                        <th>Телефон</th>
+                                        <th>Действия</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="teachersList">
+                                    <!-- Преподаватели будут загружены через AJAX -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
             </div>
-        </div>
-    </div>
-</div>
-                                        <!-- Модальное окно для добавления преподавателя -->
-<div class="modal fade" id="addTeacherModal" tabindex="-1" aria-labelledby="addTeacherModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="addTeacherModalLabel">Добавить преподавателя</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+            <!-- Модальное окно для добавления преподавателя -->
+            <div class="modal fade" id="addTeacherModal" tabindex="-1" aria-labelledby="addTeacherModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="addTeacherModalLabel">Добавить преподавателя</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="addTeacherForm">
+                                <div class="form-group">
+                                    <label for="teacherFirstName">Имя</label>
+                                    <input type="text" class="form-control" id="teacherFirstName" name="first_name" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="teacherLastName">Фамилия</label>
+                                    <input type="text" class="form-control" id="teacherLastName" name="last_name" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="teacherMiddleName">Отчество</label>
+                                    <input type="text" class="form-control" id="teacherMiddleName" name="middle_name" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="teacherEmail">Email</label>
+                                    <input type="email" class="form-control" id="teacherEmail" name="email" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="teacherPhoneNumber">Телефон</label>
+                                    <input type="text" class="form-control" id="teacherPhoneNumber" name="phone_number" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="teacherPassword">Пароль</label>
+                                    <input type="password" class="form-control" id="teacherPassword" name="password" required>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Добавить преподавателя</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="modal-body">
-                <form id="addTeacherForm">
-                    <div class="form-group">
-                        <label for="teacherFirstName">Имя</label>
-                        <input type="text" class="form-control" id="teacherFirstName" name="first_name" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="teacherLastName">Фамилия</label>
-                        <input type="text" class="form-control" id="teacherLastName" name="last_name" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="teacherMiddleName">Отчество</label>
-                        <input type="text" class="form-control" id="teacherMiddleName" name="middle_name" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="teacherEmail">Email</label>
-                        <input type="email" class="form-control" id="teacherEmail" name="email" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="teacherPhoneNumber">Телефон</label>
-                        <input type="text" class="form-control" id="teacherPhoneNumber" name="phone_number" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="teacherPassword">Пароль</label>
-                        <input type="password" class="form-control" id="teacherPassword" name="password" required>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Добавить преподавателя</button>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
 
-<!-- Модальное окно для редактирования преподавателя -->
-<div class="modal fade" id="editTeacherModal" tabindex="-1" aria-labelledby="editTeacherModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="editTeacherModalLabel">Редактировать преподавателя</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+            <!-- Модальное окно для редактирования преподавателя -->
+            <div class="modal fade" id="editTeacherModal" tabindex="-1" aria-labelledby="editTeacherModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="editTeacherModalLabel">Редактировать преподавателя</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="editTeacherForm">
+                                <input type="hidden" id="editTeacherId" name="id">
+                                <div class="form-group">
+                                    <label for="editTeacherFirstName">Имя</label>
+                                    <input type="text" class="form-control" id="editTeacherFirstName" name="first_name" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="editTeacherLastName">Фамилия</label>
+                                    <input type="text" class="form-control" id="editTeacherLastName" name="last_name" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="editTeacherMiddleName">Отчество</label>
+                                    <input type="text" class="form-control" id="editTeacherMiddleName" name="middle_name" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="editTeacherEmail">Email</label>
+                                    <input type="email" class="form-control" id="editTeacherEmail" name="email" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="editTeacherPhoneNumber">Телефон</label>
+                                    <input type="text" class="form-control" id="editTeacherPhoneNumber" name="phone_number" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="editTeacherPassword">Пароль</label>
+                                    <input type="password" class="form-control" id="editTeacherPassword" name="password">
+                                </div>
+                                <button type="submit" class="btn btn-primary">Сохранить изменения</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="modal-body">
-                <form id="editTeacherForm">
-                    <input type="hidden" id="editTeacherId" name="id">
-                    <div class="form-group">
-                        <label for="editTeacherFirstName">Имя</label>
-                        <input type="text" class="form-control" id="editTeacherFirstName" name="first_name" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="editTeacherLastName">Фамилия</label>
-                        <input type="text" class="form-control" id="editTeacherLastName" name="last_name" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="editTeacherMiddleName">Отчество</label>
-                        <input type="text" class="form-control" id="editTeacherMiddleName" name="middle_name" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="editTeacherEmail">Email</label>
-                        <input type="email" class="form-control" id="editTeacherEmail" name="email" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="editTeacherPhoneNumber">Телефон</label>
-                        <input type="text" class="form-control" id="editTeacherPhoneNumber" name="phone_number" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="editTeacherPassword">Пароль</label>
-                        <input type="password" class="form-control" id="editTeacherPassword" name="password">
-                    </div>
-                    <button type="submit" class="btn btn-primary">Сохранить изменения</button>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
 
             <!-- Модальное окно для добавления товара -->
             <div class="modal fade" id="addItemModal" tabindex="-1" aria-labelledby="addItemModalLabel" aria-hidden="true">
@@ -1007,71 +1007,75 @@ $rejectedCertificates = getCertificatesByStatus('отклонено', $conn);
         });
 
         // Загрузка списка преподавателей
-    function loadTeachers() {
-        $.get('./database/get_teachers.php', function(data) {
-            $('#teachersList').html(data);
-        });
-    }
+        function loadTeachers() {
+            $.get('./database/get_teachers.php', function(data) {
+                $('#teachersList').html(data);
+            });
+        }
 
-    loadTeachers();
+        loadTeachers();
 
-    // Обработка формы добавления преподавателя
-    $('#addTeacherForm').submit(function(e) {
-        e.preventDefault();
-        $.post('./database/add_teacher.php', $(this).serialize(), function(response) {
-            if (response.success) {
-                alert('Преподаватель добавлен успешно!');
-                $('#addTeacherModal').modal('hide');
-                loadTeachers();
-            } else {
-                alert('Ошибка при добавлении преподавателя: ' + response.error);
-            }
-        }, 'json');
-    });
-
-    // Открытие модального окна для редактирования преподавателя
-    $(document).on('click', '.edit-teacher-btn', function() {
-        var teacherId = $(this).data('id');
-        $.get('./database/get_teacher.php', { id: teacherId }, function(data) {
-            var teacher = JSON.parse(data);
-            $('#editTeacherId').val(teacher.id);
-            $('#editTeacherFirstName').val(teacher.first_name);
-            $('#editTeacherLastName').val(teacher.last_name);
-            $('#editTeacherMiddleName').val(teacher.middle_name);
-            $('#editTeacherEmail').val(teacher.email);
-            $('#editTeacherPhoneNumber').val(teacher.phone_number);
-            $('#editTeacherModal').modal('show');
-        });
-    });
-
-    // Обработка формы редактирования преподавателя
-    $('#editTeacherForm').submit(function(e) {
-        e.preventDefault();
-        $.post('./database/edit_teacher.php', $(this).serialize(), function(response) {
-            if (response.success) {
-                alert('Данные преподавателя обновлены успешно!');
-                $('#editTeacherModal').modal('hide');
-                loadTeachers();
-            } else {
-                alert('Ошибка при обновлении данных преподавателя: ' + response.error);
-            }
-        }, 'json');
-    });
-
-    // Удаление преподавателя
-    $(document).on('click', '.delete-teacher-btn', function() {
-        if (confirm('Вы уверены, что хотите удалить этого преподавателя?')) {
-            var teacherId = $(this).data('id');
-            $.post('./database/delete_teacher.php', { id: teacherId }, function(response) {
+        // Обработка формы добавления преподавателя
+        $('#addTeacherForm').submit(function(e) {
+            e.preventDefault();
+            $.post('./database/add_teacher.php', $(this).serialize(), function(response) {
                 if (response.success) {
-                    alert('Преподаватель удален успешно!');
+                    alert('Преподаватель добавлен успешно!');
+                    $('#addTeacherModal').modal('hide');
                     loadTeachers();
                 } else {
-                    alert('Ошибка при удалении преподавателя: ' + response.error);
+                    alert('Ошибка при добавлении преподавателя: ' + response.error);
                 }
             }, 'json');
-        }
-    });
+        });
+
+        // Открытие модального окна для редактирования преподавателя
+        $(document).on('click', '.edit-teacher-btn', function() {
+            var teacherId = $(this).data('id');
+            $.get('./database/get_teacher.php', {
+                id: teacherId
+            }, function(data) {
+                var teacher = JSON.parse(data);
+                $('#editTeacherId').val(teacher.id);
+                $('#editTeacherFirstName').val(teacher.first_name);
+                $('#editTeacherLastName').val(teacher.last_name);
+                $('#editTeacherMiddleName').val(teacher.middle_name);
+                $('#editTeacherEmail').val(teacher.email);
+                $('#editTeacherPhoneNumber').val(teacher.phone_number);
+                $('#editTeacherModal').modal('show');
+            });
+        });
+
+        // Обработка формы редактирования преподавателя
+        $('#editTeacherForm').submit(function(e) {
+            e.preventDefault();
+            $.post('./database/edit_teacher.php', $(this).serialize(), function(response) {
+                if (response.success) {
+                    alert('Данные преподавателя обновлены успешно!');
+                    $('#editTeacherModal').modal('hide');
+                    loadTeachers();
+                } else {
+                    alert('Ошибка при обновлении данных преподавателя: ' + response.error);
+                }
+            }, 'json');
+        });
+
+        // Удаление преподавателя
+        $(document).on('click', '.delete-teacher-btn', function() {
+            if (confirm('Вы уверены, что хотите удалить этого преподавателя?')) {
+                var teacherId = $(this).data('id');
+                $.post('./database/delete_teacher.php', {
+                    id: teacherId
+                }, function(response) {
+                    if (response.success) {
+                        alert('Преподаватель удален успешно!');
+                        loadTeachers();
+                    } else {
+                        alert('Ошибка при удалении преподавателя: ' + response.error);
+                    }
+                }, 'json');
+            }
+        });
     </script>
 
 </body>

@@ -13,10 +13,16 @@ function getMarketItems($conn) {
     return $items;
 }
 
+function getRandomColorClass() {
+    $colors = ['red', 'yellow', 'blue', 'pink', 'dark-blue'];
+    return $colors[array_rand($colors)];
+}
+
 function addMarketItem($item_name, $price, $conn) {
-    $sql = "INSERT INTO market (item_name, price) VALUES (?, ?)";
+    $color_class = getRandomColorClass();
+    $sql = "INSERT INTO market (item_name, price, color_class) VALUES (?, ?, ?)";
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("si", $item_name, $price);
+    $stmt->bind_param("sis", $item_name, $price, $color_class);
     return $stmt->execute();
 }
 

@@ -41,7 +41,7 @@ if ($participation_result && mysqli_num_rows($participation_result) > 0) {
 ?>
 
 <div class="container">
-    <h2 class="text-center mb-4">Мероприятия</h2>
+    <h2 class="text-center mb-4"><span style="color: #ff5f5f;">М</span>ероприятия</h2>
     <div class="mb-4">
         <a href="?tab=all" class="btn btn-outline-primary <?php echo $active_tab == 'all' ? 'active' : ''; ?>">Все мероприятия</a>
         <a href="?tab=my" class="btn btn-outline-primary <?php echo $active_tab == 'my' ? 'active' : ''; ?>">Мои мероприятия</a>

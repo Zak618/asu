@@ -12,6 +12,7 @@ session_start();
   <link rel="stylesheet" href="../css/start.css">
   <link rel="stylesheet" href="../css/profile.css">
   <link rel="stylesheet" href="../css/events.css">
+  <link rel="stylesheet" href="../css/market.css">
 </head>
 
 <body>
@@ -30,7 +31,7 @@ session_start();
             <a class="nav-link px-2 link-dark" href="../events.php">Мероприятия</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link px-2 link-dark" href="#">Маркет</a>
+            <a class="nav-link px-2 link-dark" href="../market.php">Маркет</a>
           </li>
         </ul>
         <ul class="navbar-nav d-lg-none w-100 justify-content-center">
