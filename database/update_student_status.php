@@ -1,6 +1,10 @@
 <?php
 include_once "db.php";
 
+header('Content-Type: application/json');
+
+$response = ["success" => false, "error" => ""];
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $student_id = $_POST['student_id'];
     $status = $_POST['status'];
@@ -20,12 +24,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     if ($stmt->execute()) {
-        echo "Статус обновлен";
+        $response["success"] = true;
+        $response["message"] = "Статус обновлен";
     } else {
-        echo "Ошибка: " . $conn->error;
+        $response["error"] = "Ошибка: " . $conn->error;
     }
 
     $stmt->close();
-    $conn->close();
+} else {
+    $response["error"] = "Неверный метод запроса";
 }
+
+$conn->close();
+echo json_encode($response);
 ?>

@@ -2,13 +2,64 @@
 session_start();
 
 include_once "./database/db.php";
+include_once "./database/market_db.php";
 
 if (!isset($_SESSION['moderator_id'])) {
     header("Location: moderator_login_form.php");
     exit();
 }
 
-// Получение списка студентов по статусу
+if (isset($_POST['add_item'])) {
+    $item_name = $_POST['item_name'];
+    $price = $_POST['price'];
+    if (addMarketItem($item_name, $price, $conn)) {
+        echo "<script>alert('Товар добавлен успешно!');</script>";
+    } else {
+        echo "<script>alert('Ошибка при добавлении товара!');</script>";
+    }
+}
+
+if (isset($_POST['edit_item'])) {
+    $id = $_POST['item_id'];
+    $item_name = $_POST['item_name'];
+    $price = $_POST['price'];
+    if (updateMarketItem($id, $item_name, $price, $conn)) {
+        echo "<script>alert('Товар обновлен успешно!');</script>";
+    } else {
+        echo "<script>alert('Ошибка при обновлении товара!');</script>";
+    }
+}
+
+if (isset($_POST['delete_item'])) {
+    $id = $_POST['item_id'];
+    if (deleteMarketItem($id, $conn)) {
+        echo "<script>alert('Товар удален успешно!');</script>";
+    } else {
+        echo "<script>alert('Ошибка при удалении товара!');</script>";
+    }
+}
+
+if (isset($_POST['accept_student'])) {
+    $id = $_POST['student_id'];
+    if (updateStudentStatus($id, 1, $conn)) { // статус 1 - принят
+        echo "<script>alert('Заявка принята!');</script>";
+    } else {
+        echo "<script>alert('Ошибка при принятии заявки!');</script>";
+    }
+}
+
+if (isset($_POST['reject_student'])) {
+    $id = $_POST['student_id'];
+    $comment = $_POST['comment'];
+    if (updateStudentStatus($id, 2, $conn, $comment)) { // статус 2 - отклонен
+        echo "<script>alert('Заявка отклонена!');</script>";
+    } else {
+        echo "<script>alert('Ошибка при отклонении заявки!');</script>";
+    }
+}
+
+$marketItems = getMarketItems($conn);
+
 function getStudentsByStatus($status, $conn)
 {
     $sql = "SELECT * FROM users WHERE moderator_status = ?";
@@ -25,6 +76,13 @@ function getStudentsByStatus($status, $conn)
     return $students;
 }
 
+function updateStudentStatus($id, $status, $conn, $comment = '')
+{
+    $sql = "UPDATE users SET moderator_status = ?, moderator_comment = ? WHERE id = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("isi", $status, $comment, $id);
+    return $stmt->execute();
+}
 // Получение всех мероприятий
 function getEvents($conn)
 {
@@ -59,7 +117,6 @@ function getCertificatesByStatus($status, $conn)
     }
     return $certificates;
 }
-
 $events = getEvents($conn);
 
 $newStudents = getStudentsByStatus(0, $conn);
@@ -106,8 +163,100 @@ $rejectedCertificates = getCertificatesByStatus('отклонено', $conn);
             <li class="nav-item">
                 <a class="nav-link" id="certificates-tab" data-toggle="tab" href="#certificates" role="tab" aria-controls="certificates" aria-selected="false">Сертификаты</a>
             </li>
+            <li class="nav-item">
+                <a class="nav-link" id="market-tab" data-toggle="tab" href="#market" role="tab" aria-controls="market" aria-selected="false">Маркет</a>
+            </li>
         </ul>
         <div class="tab-content" id="studentTabsContent">
+            <div class="tab-pane fade" id="market" role="tabpanel" aria-labelledby="market-tab">
+                <div class="row mt-3">
+                    <div class="col-12 text-right">
+                        <button class="btn btn-primary mb-3" data-toggle="modal" data-target="#addItemModal">Добавить товар</button>
+                    </div>
+                    <div class="col-12">
+                        <div class="table-responsive">
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Наименование</th>
+                                        <th>Цена</th>
+                                        <th>Действия</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php foreach ($marketItems as $item) : ?>
+                                        <tr>
+                                            <td><?php echo htmlspecialchars($item['item_name']); ?></td>
+                                            <td><?php echo htmlspecialchars($item['price']); ?></td>
+                                            <td>
+                                                <button class="btn btn-warning btn-sm edit-market-btn" data-id="<?php echo $item['id']; ?>" data-name="<?php echo htmlspecialchars($item['item_name']); ?>" data-price="<?php echo $item['price']; ?>">Редактировать</button>
+                                                <form method="post" action="" class="d-inline">
+                                                    <input type="hidden" name="item_id" value="<?php echo $item['id']; ?>">
+                                                    <button type="submit" name="delete_item" class="btn btn-danger btn-sm">Удалить</button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+             <!-- Модальное окно для добавления товара -->
+             <div class="modal fade" id="addItemModal" tabindex="-1" aria-labelledby="addItemModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="addItemModalLabel">Добавить товар</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <form method="post" action="">
+                                <div class="mb-3">
+                                    <label for="itemName" class="form-label">Наименование</label>
+                                    <input type="text" class="form-control" id="itemName" name="item_name" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="itemPrice" class="form-label">Цена</label>
+                                    <input type="number" class="form-control" id="itemPrice" name="price" required>
+                                </div>
+                                <button type="submit" name="add_item" class="btn btn-primary">Добавить</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Модальное окно для редактирования товара -->
+            <div class="modal fade" id="editItemModal" tabindex="-1" aria-labelledby="editItemModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="editItemModalLabel">Редактировать товар</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <form method="post" action="">
+                                <input type="hidden" id="editItemId" name="item_id">
+                                <div class="mb-3">
+                                    <label for="editItemName" class="form-label">Наименование</label>
+                                    <input type="text" class="form-control" id="editItemName" name="item_name" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="editItemPrice" class="form-label">Цена</label>
+                                    <input type="number" class="form-control" id="editItemPrice" name="price" required>
+                                </div>
+                                <button type="submit" name="edit_item" class="btn btn-primary">Сохранить изменения</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <!-- Мероприятия -->
             <div class="tab-pane fade show active" id="events" role="tabpanel" aria-labelledby="events-tab">
                 <div class="row mt-3">
@@ -131,7 +280,7 @@ $rejectedCertificates = getCertificatesByStatus('отклонено', $conn);
                                             <p class="card-text"><strong>Очки за приз:</strong> <?php echo htmlspecialchars($event['points_prize']); ?></p>
                                             <p class="card-text"><strong>Очки за участие:</strong> <?php echo htmlspecialchars($event['points_participant']); ?></p>
                                             <div class="mt-auto text-right">
-                                                <button class="btn btn-warning btn-sm edit-btn" data-id="<?php echo $event['id']; ?>">Редактировать</button>
+                                                <button class="btn btn-warning btn-sm edit-event-btn" data-id="<?php echo $event['id']; ?>">Редактировать</button>
                                                 <button class="btn btn-danger btn-sm delete-btn" data-id="<?php echo $event['id']; ?>">Удалить</button>
                                             </div>
                                         </div>
@@ -442,78 +591,45 @@ $rejectedCertificates = getCertificatesByStatus('отклонено', $conn);
         </div>
     </div>
 
-    <!-- Модальное окно для комментария -->
-    <div class="modal fade" id="rejectModal" tabindex="-1" aria-labelledby="rejectModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="rejectModalLabel">Причина отклонения</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-
-                </div>
-                <div class="modal-body">
-                    <form id="rejectForm">
-                        <div class="mb-3">
-                            <label for="rejectComment" class="form-label">Комментарий</label>
-                            <textarea class="form-control" id="rejectComment" name="comment" required></textarea>
-                        </div>
-                        <input type="hidden" id="rejectStudentId" name="student_id">
-                        <button type="submit" class="btn btn-primary">Отправить</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Модальное окно для информации о направлении -->
-    <div class="modal fade" id="acceptModal" tabindex="-1" aria-labelledby="acceptModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="acceptModalLabel">Информация о направлении</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-
-                </div>
-                <div class="modal-body">
-                    <form id="acceptForm">
-                        <div class="mb-3">
-                            <label for="directionCode" class="form-label">Код направления</label>
-                            <input type="text" class="form-control" id="directionCode" name="direction_code" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="directionName" class="form-label">Название направления</label>
-                            <input type="text" class="form-control" id="directionName" name="direction_name" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="profile" class="form-label">Профиль</label>
-                            <input type="text" class="form-control" id="profile" name="profile" required>
-                        </div>
-                        <input type="hidden" id="acceptStudentId" name="student_id">
-                        <button type="submit" class="btn btn-primary">Отправить</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-                                <!-- Модальное окно для причины отклонения сертификата -->
-<div class="modal fade" id="rejectModal" tabindex="-1" aria-labelledby="rejectModalLabel" aria-hidden="true">
+<!-- Модальное окно для отклонения заявки студента -->
+<div class="modal fade" id="rejectStudentModal" tabindex="-1" aria-labelledby="rejectStudentModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="rejectModalLabel">Причина отклонения</h5>
+                <h5 class="modal-title" id="rejectStudentModalLabel">Причина отклонения заявки</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
-                <form id="rejectForm">
+                <form id="rejectStudentForm">
                     <div class="mb-3">
-                        <label for="rejectComment" class="form-label">Комментарий</label>
-                        <textarea class="form-control" id="rejectComment" name="comment" required></textarea>
+                        <label for="rejectStudentComment" class="form-label">Комментарий</label>
+                        <textarea class="form-control" id="rejectStudentComment" name="comment" required></textarea>
+                    </div>
+                    <input type="hidden" id="rejectStudentId" name="student_id">
+                    <button type="submit" class="btn btn-primary">Отправить</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно для отклонения сертификата -->
+<div class="modal fade" id="rejectCertificateModal" tabindex="-1" aria-labelledby="rejectCertificateModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="rejectCertificateModalLabel">Причина отклонения сертификата</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="rejectCertificateForm">
+                    <div class="mb-3">
+                        <label for="rejectCertificateComment" class="form-label">Комментарий</label>
+                        <textarea class="form-control" id="rejectCertificateComment" name="comment" required></textarea>
                     </div>
                     <input type="hidden" id="rejectCertificateId" name="certificate_id">
                     <button type="submit" class="btn btn-primary">Отправить</button>
@@ -522,6 +638,41 @@ $rejectedCertificates = getCertificatesByStatus('отклонено', $conn);
         </div>
     </div>
 </div>
+
+
+    <!-- Модальное окно для информации о направлении -->
+<div class="modal fade" id="acceptStudentModal" tabindex="-1" aria-labelledby="acceptStudentModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="acceptStudentModalLabel">Информация о направлении</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="acceptStudentForm">
+                    <div class="mb-3">
+                        <label for="directionCode" class="form-label">Код направления</label>
+                        <input type="text" class="form-control" id="directionCode" name="direction_code" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="directionName" class="form-label">Название направления</label>
+                        <input type="text" class="form-control" id="directionName" name="direction_name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="profile" class="form-label">Профиль</label>
+                        <input type="text" class="form-control" id="profile" name="profile" required>
+                    </div>
+                    <input type="hidden" id="acceptStudentId" name="student_id">
+                    <button type="submit" class="btn btn-primary">Принять</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
@@ -546,7 +697,7 @@ $(document).ready(function() {
     });
 
     // Редактирование мероприятия
-    $('.edit-btn').click(function() {
+    $('.edit-event-btn').click(function() {
         var eventId = $(this).data('id');
         $.get('./database/get_event.php', {
             id: eventId
@@ -637,24 +788,27 @@ $(document).ready(function() {
         }
     });
 
+    // Принятие сертификата
     $('.accept-certificate-btn').click(function() {
         var certificateId = $(this).data('id');
         updateCertificateStatus(certificateId, 'принято');
     });
 
+    // Отклонение сертификата
     $('.reject-certificate-btn').click(function() {
         var certificateId = $(this).data('id');
         $('#rejectCertificateId').val(certificateId);
-        $('#rejectModal').modal('show');
+        $('#rejectCertificateModal').modal('show');
     });
 
-    $('#rejectForm').submit(function(e) {
+    $('#rejectCertificateForm').submit(function(e) {
         e.preventDefault();
         var certificateId = $('#rejectCertificateId').val();
-        var comment = $('#rejectComment').val();
+        var comment = $('#rejectCertificateComment').val();
         updateCertificateStatus(certificateId, 'отклонено', comment);
     });
 
+    // Функция для обновления статуса сертификата
     function updateCertificateStatus(certificateId, status, comment = '') {
         $.post('./database/update_certificate_status.php', {
             certificate_id: certificateId,
@@ -668,12 +822,74 @@ $(document).ready(function() {
             }
         }, 'json');
     }
+
+    // Редактирование товара
+    $('.edit-market-btn').click(function() {
+        var itemId = $(this).data('id');
+        var itemName = $(this).data('name');
+        var itemPrice = $(this).data('price');
+        $('#editItemId').val(itemId);
+        $('#editItemName').val(itemName);
+        $('#editItemPrice').val(itemPrice);
+        $('#editItemModal').modal('show');
+    });
+
+    // Принятие заявки студента
+    $('.accept-btn').click(function() {
+        var studentId = $(this).data('id');
+        $('#acceptStudentId').val(studentId);
+        $('#acceptStudentModal').modal('show');
+    });
+
+    $('#acceptStudentForm').submit(function(e) {
+        e.preventDefault();
+        var studentId = $('#acceptStudentId').val();
+        var directionCode = $('#directionCode').val();
+        var directionName = $('#directionName').val();
+        var profile = $('#profile').val();
+
+        $.post('./database/update_student_status.php', {
+            student_id: studentId,
+            status: 1, // статус 1 - принят
+            direction_code: directionCode,
+            direction_name: directionName,
+            profile: profile
+        }, function(response) {
+            if (response.success) {
+                location.reload();
+            } else {
+                alert('Произошла ошибка: ' + response.error);
+            }
+        }, 'json');
+    });
+
+    // Отклонение заявки студента
+    $('.reject-btn').click(function() {
+        var studentId = $(this).data('id');
+        $('#rejectStudentId').val(studentId);
+        $('#rejectStudentModal').modal('show');
+    });
+
+    $('#rejectStudentForm').submit(function(e) {
+        e.preventDefault();
+        var studentId = $('#rejectStudentId').val();
+        var comment = $('#rejectStudentComment').val();
+
+        $.post('./database/update_student_status.php', {
+            student_id: studentId,
+            status: 2, // статус 2 - отклонен
+            comment: comment
+        }, function(response) {
+            if (response.success) {
+                location.reload();
+            } else {
+                alert('Произошла ошибка: ' + response.error);
+            }
+        }, 'json');
+    });
 });
-</script>
 
 </script>
-
-
 
 </body>
 

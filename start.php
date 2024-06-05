@@ -73,10 +73,10 @@ if ($participation_result && mysqli_num_rows($participation_result) > 0) {
                     <?php else: ?>
                         <ul class="list-unstyled">
                             <?php foreach ($my_events as $event): ?>
-                                <li class="event-item"><?php echo htmlspecialchars($event['title']); ?></li>
+                                <a href="event.php?id=<?php echo $event['id']; ?>"><li class="event-item"><?php echo htmlspecialchars($event['title']); ?></li></a>
                             <?php endforeach; ?>
                         </ul>
-                        <a href="#" class="btn btn-light btn-more">Смотреть еще...</a>
+                        <a href="events.php?tab=my" class="btn btn-light btn-more">Смотреть еще...</a>
                     <?php endif; ?>
                 </div>
             </div>
