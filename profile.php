@@ -47,6 +47,15 @@ $stmt_prizer->execute();
 $result_prizer = $stmt_prizer->get_result();
 $prizer_accepted = $result_prizer->num_rows > 0;
 
+// Проверка призёров
+$sql_prizer = "SELECT COUNT(*) as prizer_count FROM certificate WHERE user_id = ? AND place = 'призёр' AND moderator_status = 'принято'";
+$stmt_prizer = $conn->prepare($sql_prizer);
+$stmt_prizer->bind_param("i", $user_id);
+$stmt_prizer->execute();
+$result_prizer = $stmt_prizer->get_result();
+$row_prizer = $result_prizer->fetch_assoc();
+$prizer_count = $row_prizer['prizer_count'];
+
 // Проверка победителей
 $sql_winner = "SELECT * FROM certificate WHERE user_id = ? AND place = 'победитель' AND moderator_status = 'принято'";
 $stmt_winner = $conn->prepare($sql_winner);
@@ -63,6 +72,15 @@ $stmt_activated_coupons->execute();
 $result_activated_coupons = $stmt_activated_coupons->get_result();
 $row_activated_coupons = $result_activated_coupons->fetch_assoc();
 $activated_count = $row_activated_coupons['activated_count'];
+
+// Проверка победителей
+$sql_winner = "SELECT COUNT(*) as winner_count FROM certificate WHERE user_id = ? AND place = 'победитель' AND moderator_status = 'принято'";
+$stmt_winner = $conn->prepare($sql_winner);
+$stmt_winner->bind_param("i", $user_id);
+$stmt_winner->execute();
+$result_winner = $stmt_winner->get_result();
+$row_winner = $result_winner->fetch_assoc();
+$winner_count = $row_winner['winner_count'];
 ?>
 
 <div class="container">
@@ -126,6 +144,10 @@ $activated_count = $row_activated_coupons['activated_count'];
 
           <div class="award" data-title="Медаль за 10 участий">
             <img src="<?php echo ($participant_count >= 10) ? '../images/awards/7a.png' : '../images/awards/7.png'; ?>" alt="Медаль за 10 участий">
+          </div>
+
+          <div class="award" data-title="Медаль за 10 призовых мест">
+            <img src="<?php echo ($prizer_count >= 10) ? '../images/awards/8a.png' : '../images/awards/8.png'; ?>" alt="Медаль за 10 призовых мест">
           </div>
           <!-- Добавьте другие награды здесь -->
         </div>
