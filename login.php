@@ -19,6 +19,9 @@ include_once "./database/db.php";
                     </div>
                     <button type="submit" class="btn btn-primary w-100">Войти</button>
                 </form>
+                <div class="text-center mt-3">
+                    <p>Еще нет аккаунта? <a href="register.php">Зарегистрироваться</a></p>
+                </div>
             </div>
         </div>
     </div>

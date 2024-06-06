@@ -164,48 +164,51 @@ $winner_count = $user_data['winner_count'];
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-  document.addEventListener('DOMContentLoaded', function() {
-    fetch('./database/get_participation_data.php')
-      .then(response => response.json())
-      .then(data => {
-        const months = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'];
-        const chartData = new Array(12).fill(0);
+document.addEventListener('DOMContentLoaded', function() {
+    const userId = <?php echo json_encode($user_id); ?>;
+    
+    fetch('./database/get_participation_data.php?user_id=' + userId)
+        .then(response => response.json())
+        .then(data => {
+            const months = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'];
+            const chartData = new Array(12).fill(0);
 
-        data.forEach(item => {
-          chartData[item.month - 1] = item.participation_count;
-        });
+            data.forEach(item => {
+                chartData[item.month - 1] = item.participation_count;
+            });
 
-        const ctx = document.getElementById('participationChart').getContext('2d');
-        const participationChart = new Chart(ctx, {
-          type: 'line',
-          data: {
-            labels: months,
-            datasets: [{
-              label: 'Участия',
-              data: chartData,
-              borderColor: 'rgba(75, 192, 192, 1)',
-              borderWidth: 2,
-              fill: false,
-              tension: 0.1
-            }]
-          },
-          options: {
-            scales: {
-              y: {
-                beginAtZero: true,
-                max: 20
-              }
-            },
-            plugins: {
-              legend: {
-                display: false
-              }
-            }
-          }
-        });
-      })
-      .catch(error => console.error('Error fetching data:', error));
-  });
+            const ctx = document.getElementById('participationChart').getContext('2d');
+            const participationChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: months,
+                    datasets: [{
+                        label: 'Участия',
+                        data: chartData,
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 2,
+                        fill: false,
+                        tension: 0.1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 20
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+        })
+        .catch(error => console.error('Error fetching data:', error));
+});
+
 </script>
 <?php
 include_once "./base/footer.php";
