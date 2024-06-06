@@ -123,6 +123,10 @@ $activated_count = $row_activated_coupons['activated_count'];
           <div class="award" data-title="Медаль за 3 активированных купона">
             <img src="<?php echo ($activated_count >= 3) ? '../images/awards/6a.png' : '../images/awards/6.png'; ?>" alt="Медаль за 3 активированных купона">
           </div>
+
+          <div class="award" data-title="Медаль за 10 участий">
+            <img src="<?php echo ($participant_count >= 10) ? '../images/awards/7a.png' : '../images/awards/7.png'; ?>" alt="Медаль за 10 участий">
+          </div>
           <!-- Добавьте другие награды здесь -->
         </div>
 
