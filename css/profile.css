@@ -49,3 +49,49 @@ h3 {
   width: 100%;
   height: 100%;
 }
+
+.showcase-container {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin: 0 auto;
+  max-width: 1200px;
+  padding: 20px;
+}
+
+.award {
+  position: relative;
+  margin: 10px;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.award img {
+  width: 100px;
+  height: 100px;
+  transition: transform 0.3s;
+}
+
+.award:hover img {
+  transform: scale(1.2);
+  background: transparent; /* Убираем фон при увеличении */
+}
+
+.award::after {
+  content: attr(data-title);
+  position: absolute;
+  left: 50%;
+  top: 110%;
+  transform: translateX(-50%);
+  opacity: 0;
+  background: rgba(0, 0, 0, 0.75);
+  color: #fff;
+  padding: 5px 10px;
+  border-radius: 5px;
+  font-size: 0.9em;
+  white-space: nowrap;
+  transition: opacity 0.3s;
+}
+
+.award:hover::after {
+  opacity: 1;
+}

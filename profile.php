@@ -4,8 +4,8 @@ include_once "./base/header.php";
 session_start();
 
 if (!isset($_SESSION['user_id'])) {
-    header("Location: login.php");
-    exit();
+  header("Location: login.php");
+  exit();
 }
 
 $user_name = $_SESSION['first_name'] . " " . $_SESSION['last_name'];
@@ -22,44 +22,56 @@ $phone_number = $_SESSION['phone_number'] ?? null;
 ?>
 
 <div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-10 col-lg-8">
-            <div class="profile text-center">
-                <div class="profile-picture-container">
-                    <img src="<?php echo htmlspecialchars($avatar_url); ?>" alt="Profile Picture" class="profile-picture mb-3">
-                </div>
-                <div class="profile-info">
-                    <h3><?php echo htmlspecialchars($user_name); ?></h3>
-                    <p><?php echo htmlspecialchars($group_name); ?> · <?php echo htmlspecialchars($user_email); ?></p>
-                </div>
-                
-                <button class="btn btn-outline-secondary mb-4" data-toggle="modal" data-target="#editProfileModal">Изменить данные</button>
-
-                <?php if ($direction_code && $direction_name && $profile): ?>
-                    <div class="profile-details">
-                        <p><strong>Код направления:</strong> <?php echo htmlspecialchars($direction_code); ?></p>
-                        <p><strong>Название направления:</strong> <?php echo htmlspecialchars($direction_name); ?></p>
-                        <p><strong>Профиль:</strong> <?php echo htmlspecialchars($profile); ?></p>
-                    </div>
-                <?php else: ?>
-                    <?php if ($moderator_status == 2): ?>
-                        <div class="alert alert-danger">
-                            Причина, по которой нельзя приобретать сертификаты: <?php echo htmlspecialchars($moderator_comment); ?>
-                        </div>
-                    <?php elseif ($moderator_status == 0): ?>
-                        <div class="alert alert-warning">
-                            Профиль на проверке.
-                        </div>
-                    <?php endif; ?>
-                <?php endif; ?>
-
-                <h4>Статистика моих участий</h4>
-                <div class="chart-container">
-                    <canvas id="participationChart"></canvas>
-                </div>
-            </div>
+  <div class="row justify-content-center">
+    <div class="col-md-10 col-lg-8">
+      <div class="profile text-center">
+        <div class="profile-picture-container">
+          <img src="<?php echo htmlspecialchars($avatar_url); ?>" alt="Profile Picture" class="profile-picture mb-3">
         </div>
+        <div class="profile-info">
+          <h3><?php echo htmlspecialchars($user_name); ?></h3>
+          <p><?php echo htmlspecialchars($group_name); ?> · <?php echo htmlspecialchars($user_email); ?></p>
+        </div>
+
+        <button class="btn btn-outline-secondary mb-4" data-toggle="modal" data-target="#editProfileModal">Изменить данные</button>
+
+        <?php if ($direction_code && $direction_name && $profile) : ?>
+          <div class="profile-details">
+            <p><strong>Код направления:</strong> <?php echo htmlspecialchars($direction_code); ?></p>
+            <p><strong>Название направления:</strong> <?php echo htmlspecialchars($direction_name); ?></p>
+            <p><strong>Профиль:</strong> <?php echo htmlspecialchars($profile); ?></p>
+          </div>
+        <?php else : ?>
+          <?php if ($moderator_status == 2) : ?>
+            <div class="alert alert-danger">
+              Причина, по которой нельзя приобретать сертификаты: <?php echo htmlspecialchars($moderator_comment); ?>
+            </div>
+          <?php elseif ($moderator_status == 0) : ?>
+            <div class="alert alert-warning">
+              Профиль на проверке.
+            </div>
+          <?php endif; ?>
+        <?php endif; ?>
+
+
+        <h4>Мои достижения</h4>
+        <div class="showcase-container">
+          <div class="award" data-title="Первый игрок на готове">
+            <img src="<?php echo ($moderator_status == 1) ? '../images/awards/1a.png' : '../images/awards/1.png'; ?>" alt="Первый игрок на готове">
+          </div>
+          <!-- Добавьте другие награды здесь -->
+        </div>
+
+
+        <h4 class="mt-3">Статистика моих участий</h4>
+        <div class="chart-container">
+          <canvas id="participationChart"></canvas>
+        </div>
+
+
+      </div>
     </div>
+  </div>
 </div>
 <!-- Модальное окно для редактирования профиля -->
 <div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileModalLabel" aria-hidden="true">
@@ -109,48 +121,48 @@ $phone_number = $_SESSION['phone_number'] ?? null;
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        fetch('./database/get_participation_data.php')
-            .then(response => response.json())
-            .then(data => {
-                const months = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'];
-                const chartData = new Array(12).fill(0);
-                
-                data.forEach(item => {
-                    chartData[item.month - 1] = item.participation_count;
-                });
+  document.addEventListener('DOMContentLoaded', function() {
+    fetch('./database/get_participation_data.php')
+      .then(response => response.json())
+      .then(data => {
+        const months = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'];
+        const chartData = new Array(12).fill(0);
 
-                const ctx = document.getElementById('participationChart').getContext('2d');
-                const participationChart = new Chart(ctx, {
-                    type: 'line',
-                    data: {
-                        labels: months,
-                        datasets: [{
-                            label: 'Участия',
-                            data: chartData,
-                            borderColor: 'rgba(75, 192, 192, 1)',
-                            borderWidth: 2,
-                            fill: false,
-                            tension: 0.1
-                        }]
-                    },
-                    options: {
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                max: 20
-                            }
-                        },
-                        plugins: {
-                            legend: {
-                                display: false
-                            }
-                        }
-                    }
-                });
-            })
-            .catch(error => console.error('Error fetching data:', error));
-    });
+        data.forEach(item => {
+          chartData[item.month - 1] = item.participation_count;
+        });
+
+        const ctx = document.getElementById('participationChart').getContext('2d');
+        const participationChart = new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: months,
+            datasets: [{
+              label: 'Участия',
+              data: chartData,
+              borderColor: 'rgba(75, 192, 192, 1)',
+              borderWidth: 2,
+              fill: false,
+              tension: 0.1
+            }]
+          },
+          options: {
+            scales: {
+              y: {
+                beginAtZero: true,
+                max: 20
+              }
+            },
+            plugins: {
+              legend: {
+                display: false
+              }
+            }
+          }
+        });
+      })
+      .catch(error => console.error('Error fetching data:', error));
+  });
 </script>
 <?php
 include_once "./base/footer.php";
