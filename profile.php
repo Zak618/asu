@@ -46,6 +46,14 @@ $stmt_prizer->bind_param("i", $user_id);
 $stmt_prizer->execute();
 $result_prizer = $stmt_prizer->get_result();
 $prizer_accepted = $result_prizer->num_rows > 0;
+
+// Проверка победителей
+$sql_winner = "SELECT * FROM certificate WHERE user_id = ? AND place = 'победитель' AND moderator_status = 'принято'";
+$stmt_winner = $conn->prepare($sql_winner);
+$stmt_winner->bind_param("i", $user_id);
+$stmt_winner->execute();
+$result_winner = $stmt_winner->get_result();
+$winner_accepted = $result_winner->num_rows > 0;
 ?>
 
 <div class="container">
@@ -99,6 +107,9 @@ $prizer_accepted = $result_prizer->num_rows > 0;
             <img src="<?php echo ($prizer_accepted) ? '../images/awards/4a.png' : '../images/awards/4.png'; ?>" alt="Медаль за призовое место">
           </div>
 
+          <div class="award" data-title="Медаль за победу">
+            <img src="<?php echo ($winner_accepted) ? '../images/awards/5a.png' : '../images/awards/5.png'; ?>" alt="Медаль за победу">
+          </div>
           <!-- Добавьте другие награды здесь -->
         </div>
 
