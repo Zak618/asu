@@ -1,6 +1,6 @@
 <?php
 include_once "./base/header.php";
-include_once "./database/db.php";
+include_once "./database/check_user_data.php";
 
 session_start();
 
@@ -21,66 +21,15 @@ $moderator_status = $_SESSION['moderator_status'] ?? null;
 $moderator_comment = $_SESSION['moderator_comment'] ?? null;
 $phone_number = $_SESSION['phone_number'] ?? null;
 
-// Проверка количества участий
-$sql = "SELECT COUNT(*) as participation_count FROM event_participation WHERE student_id = ?";
-$stmt = $conn->prepare($sql);
-$stmt->bind_param("i", $user_id);
-$stmt->execute();
-$result = $stmt->get_result();
-$row = $result->fetch_assoc();
-$participation_count = $row['participation_count'];
+$user_data = check_user_data($user_id);
 
-
-// Проверка сертификатов
-$sql_certificate = "SELECT * FROM certificate WHERE user_id = ? AND place = 'участник' AND moderator_status = 'принято'";
-$stmt_certificate = $conn->prepare($sql_certificate);
-$stmt_certificate->bind_param("i", $user_id);
-$stmt_certificate->execute();
-$result_certificate = $stmt_certificate->get_result();
-$certificate_accepted = $result_certificate->num_rows > 0;
-
-// Проверка призёров
-$sql_prizer = "SELECT * FROM certificate WHERE user_id = ? AND place = 'призёр' AND moderator_status = 'принято'";
-$stmt_prizer = $conn->prepare($sql_prizer);
-$stmt_prizer->bind_param("i", $user_id);
-$stmt_prizer->execute();
-$result_prizer = $stmt_prizer->get_result();
-$prizer_accepted = $result_prizer->num_rows > 0;
-
-// Проверка призёров
-$sql_prizer = "SELECT COUNT(*) as prizer_count FROM certificate WHERE user_id = ? AND place = 'призёр' AND moderator_status = 'принято'";
-$stmt_prizer = $conn->prepare($sql_prizer);
-$stmt_prizer->bind_param("i", $user_id);
-$stmt_prizer->execute();
-$result_prizer = $stmt_prizer->get_result();
-$row_prizer = $result_prizer->fetch_assoc();
-$prizer_count = $row_prizer['prizer_count'];
-
-// Проверка победителей
-$sql_winner = "SELECT * FROM certificate WHERE user_id = ? AND place = 'победитель' AND moderator_status = 'принято'";
-$stmt_winner = $conn->prepare($sql_winner);
-$stmt_winner->bind_param("i", $user_id);
-$stmt_winner->execute();
-$result_winner = $stmt_winner->get_result();
-$winner_accepted = $result_winner->num_rows > 0;
-
-// Проверка количества активированных купонов
-$sql_activated_coupons = "SELECT COUNT(*) as activated_count FROM history_market WHERE user_id = ? AND status = 'неактивно'";
-$stmt_activated_coupons = $conn->prepare($sql_activated_coupons);
-$stmt_activated_coupons->bind_param("i", $user_id);
-$stmt_activated_coupons->execute();
-$result_activated_coupons = $stmt_activated_coupons->get_result();
-$row_activated_coupons = $result_activated_coupons->fetch_assoc();
-$activated_count = $row_activated_coupons['activated_count'];
-
-// Проверка победителей
-$sql_winner = "SELECT COUNT(*) as winner_count FROM certificate WHERE user_id = ? AND place = 'победитель' AND moderator_status = 'принято'";
-$stmt_winner = $conn->prepare($sql_winner);
-$stmt_winner->bind_param("i", $user_id);
-$stmt_winner->execute();
-$result_winner = $stmt_winner->get_result();
-$row_winner = $result_winner->fetch_assoc();
-$winner_count = $row_winner['winner_count'];
+$participation_count = $user_data['participation_count'];
+$certificate_accepted = $user_data['certificate_accepted'];
+$prizer_accepted = $user_data['prizer_accepted'];
+$prizer_count = $user_data['prizer_count'];
+$winner_accepted = $user_data['winner_accepted'];
+$activated_count = $user_data['activated_count'];
+$winner_count = $user_data['winner_count'];
 ?>
 
 <div class="container">
