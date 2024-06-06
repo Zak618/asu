@@ -99,8 +99,8 @@ $winner_count = $user_data['winner_count'];
             <img src="<?php echo ($prizer_count >= 10) ? '../images/awards/8a.png' : '../images/awards/8.png'; ?>" alt="Медаль за 10 призовых мест">
           </div>
 
-          <div class="award" data-title="Медаль за 10 призовых мест">
-            <img src="<?php echo ($prizer_count >= 10) ? '../images/awards/9a.png' : '../images/awards/9.png'; ?>" alt="Медаль за 10 призовых мест">
+          <div class="award" data-title="Медаль за 10 побед">
+            <img src="<?php echo ($winner_count >= 10) ? '../images/awards/9a.png' : '../images/awards/9.png'; ?>" alt="Медаль за 10 побед">
           </div>
           <!-- другие награды здесь -->
         </div>

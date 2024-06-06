@@ -162,13 +162,13 @@
     color: #ffcc00;
 }
 
-.inactive {
+.history > .inactive {
     background-color: #f9f9f9;
     color: #ccc;
     border-left: 6px solid #ccc;
 }
 
-.inactive .badge-custom, .inactive .operation-type, .inactive .icon {
+.history > .inactive .badge-custom, .inactive .operation-type, .inactive .icon {
     background-color: #e0e0e0;
     color: #aaa;
 }

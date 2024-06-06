@@ -31,7 +31,7 @@ $user_id = $_SESSION['user_id'];
             </div>
         </div>
         <div class="tab-pane fade" id="exchange-history" role="tabpanel" aria-labelledby="exchange-history-tab">
-            <div class="card-container" id="exchangeHistoryList">
+            <div class="card-container history" id="exchangeHistoryList">
                 <!-- История обмена будет загружена здесь -->
             </div>
         </div>
