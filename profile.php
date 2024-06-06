@@ -30,6 +30,14 @@ $result = $stmt->get_result();
 $row = $result->fetch_assoc();
 $participation_count = $row['participation_count'];
 
+
+// Проверка сертификатов
+$sql_certificate = "SELECT * FROM certificate WHERE user_id = ? AND place = 'участник' AND moderator_status = 'принято'";
+$stmt_certificate = $conn->prepare($sql_certificate);
+$stmt_certificate->bind_param("i", $user_id);
+$stmt_certificate->execute();
+$result_certificate = $stmt_certificate->get_result();
+$certificate_accepted = $result_certificate->num_rows > 0;
 ?>
 
 <div class="container">
@@ -73,6 +81,10 @@ $participation_count = $row['participation_count'];
 
           <div class="award" data-title="Участник трех мероприятий">
             <img src="<?php echo ($participation_count >= 3) ? '../images/awards/2a.png' : '../images/awards/2.png'; ?>" alt="Участник трех мероприятий">
+          </div>
+
+          <div class="award" data-title="Медаль за участие">
+            <img src="<?php echo ($certificate_accepted) ? '../images/awards/3a.png' : '../images/awards/3.png'; ?>" alt="Медаль за участие">
           </div>
 
           <!-- Добавьте другие награды здесь -->
