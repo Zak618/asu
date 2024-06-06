@@ -54,6 +54,15 @@ $stmt_winner->bind_param("i", $user_id);
 $stmt_winner->execute();
 $result_winner = $stmt_winner->get_result();
 $winner_accepted = $result_winner->num_rows > 0;
+
+// Проверка количества активированных купонов
+$sql_activated_coupons = "SELECT COUNT(*) as activated_count FROM history_market WHERE user_id = ? AND status = 'неактивно'";
+$stmt_activated_coupons = $conn->prepare($sql_activated_coupons);
+$stmt_activated_coupons->bind_param("i", $user_id);
+$stmt_activated_coupons->execute();
+$result_activated_coupons = $stmt_activated_coupons->get_result();
+$row_activated_coupons = $result_activated_coupons->fetch_assoc();
+$activated_count = $row_activated_coupons['activated_count'];
 ?>
 
 <div class="container">
@@ -109,6 +118,10 @@ $winner_accepted = $result_winner->num_rows > 0;
 
           <div class="award" data-title="Медаль за победу">
             <img src="<?php echo ($winner_accepted) ? '../images/awards/5a.png' : '../images/awards/5.png'; ?>" alt="Медаль за победу">
+          </div>
+
+          <div class="award" data-title="Медаль за 3 активированных купона">
+            <img src="<?php echo ($activated_count >= 3) ? '../images/awards/6a.png' : '../images/awards/6.png'; ?>" alt="Медаль за 3 активированных купона">
           </div>
           <!-- Добавьте другие награды здесь -->
         </div>
