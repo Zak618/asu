@@ -24,21 +24,25 @@ session_start();
       </button>
       <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
         <ul class="navbar-nav">
-          <li class="nav-item">
-            <a class="nav-link px-2 link-dark" href="../profile.php">Профиль</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link px-2 link-dark" href="../events.php">Мероприятия</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link px-2 link-dark" href="../market.php">Маркет</a>
-          </li>
+          <?php if (isset($_SESSION['user_id']) && $_SESSION['role'] == 1) : ?>
+            <li class="nav-item">
+              <a class="nav-link px-2 link-dark" href="../profile.php">Профиль</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link px-2 link-dark" href="../events.php">Мероприятия</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link px-2 link-dark" href="../market.php">Маркет</a>
+            </li>
+          <?php endif; ?>
         </ul>
         <ul class="navbar-nav d-lg-none w-100 justify-content-center">
           <li class="nav-item">
             <?php if (isset($_SESSION['user_id'])) : ?>
               <div class="balance-container">
-                <span class="balance-text"><?php echo htmlspecialchars($_SESSION['balance']); ?></span>
+                <?php if ($_SESSION['role'] == 1) : ?>
+                  <span class="balance-text"><?php echo htmlspecialchars($_SESSION['balance']); ?></span>
+                <?php endif; ?>
                 <a href="logout.php" class="btn btn-outline-danger me-2">Выйти</a>
               </div>
             <?php else : ?>
@@ -50,7 +54,9 @@ session_start();
       <div class="d-none d-lg-block ms-auto">
         <?php if (isset($_SESSION['user_id'])) : ?>
           <div class="balance-container">
-            <span class="balance-text mr-10"><?php echo htmlspecialchars($_SESSION['balance']); ?></span>
+            <?php if ($_SESSION['role'] == 1) : ?>
+              <span class="balance-text mr-10"><?php echo htmlspecialchars($_SESSION['balance']); ?></span>
+            <?php endif; ?>
             <a href="logout.php" class="btn btn-outline-danger me-2">Выйти</a>
           </div>
         <?php else : ?>
@@ -59,3 +65,5 @@ session_start();
       </div>
     </header>
   </div>
+</body>
+</html>

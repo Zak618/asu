@@ -14,7 +14,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     if ($result->num_rows > 0) {
         $user = $result->fetch_assoc();
-        if (password_verify($password, $user['password']) && $user['role'] == 1) {
+        if (password_verify($password, $user['password'])) {
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['user_email'] = $user['email'];
             $_SESSION['first_name'] = $user['first_name'];
@@ -28,7 +28,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $_SESSION['moderator_status'] = $user['moderator_status'];
             $_SESSION['moderator_comment'] = $user['moderator_comment'];
             $_SESSION['phone_number'] = $user['phone_number'];
-            header("Location: ../profile.php");
+            $_SESSION['role'] = $user['role'];
+            
+            if ($user['role'] == 2) {
+                header("Location: ../teacher_coupons.php");
+            } else {
+                header("Location: ../profile.php");
+            }
             exit();
         } else {
             echo "Неверный пароль или у вас нет доступа.";
