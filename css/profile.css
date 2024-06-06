@@ -90,6 +90,7 @@ h3 {
   font-size: 0.9em;
   white-space: nowrap;
   transition: opacity 0.3s;
+  z-index: 1;
 }
 
 .award:hover::after {
