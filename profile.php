@@ -1,5 +1,6 @@
 <?php
 include_once "./base/header.php";
+include_once "./database/db.php";
 
 session_start();
 
@@ -19,6 +20,16 @@ $profile = $_SESSION['profile'] ?? null;
 $moderator_status = $_SESSION['moderator_status'] ?? null;
 $moderator_comment = $_SESSION['moderator_comment'] ?? null;
 $phone_number = $_SESSION['phone_number'] ?? null;
+
+// Проверка количества участий
+$sql = "SELECT COUNT(*) as participation_count FROM event_participation WHERE student_id = ?";
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("i", $user_id);
+$stmt->execute();
+$result = $stmt->get_result();
+$row = $result->fetch_assoc();
+$participation_count = $row['participation_count'];
+
 ?>
 
 <div class="container">
@@ -59,6 +70,11 @@ $phone_number = $_SESSION['phone_number'] ?? null;
           <div class="award" data-title="Первый игрок на готове">
             <img src="<?php echo ($moderator_status == 1) ? '../images/awards/1a.png' : '../images/awards/1.png'; ?>" alt="Первый игрок на готове">
           </div>
+
+          <div class="award" data-title="Участник трех мероприятий">
+            <img src="<?php echo ($participation_count >= 3) ? '../images/awards/2a.png' : '../images/awards/2.png'; ?>" alt="Участник трех мероприятий">
+          </div>
+
           <!-- Добавьте другие награды здесь -->
         </div>
 
