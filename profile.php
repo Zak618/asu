@@ -149,7 +149,11 @@ $winner_count = $row_winner['winner_count'];
           <div class="award" data-title="Медаль за 10 призовых мест">
             <img src="<?php echo ($prizer_count >= 10) ? '../images/awards/8a.png' : '../images/awards/8.png'; ?>" alt="Медаль за 10 призовых мест">
           </div>
-          <!-- Добавьте другие награды здесь -->
+
+          <div class="award" data-title="Медаль за 10 призовых мест">
+            <img src="<?php echo ($prizer_count >= 10) ? '../images/awards/9a.png' : '../images/awards/9a.png'; ?>" alt="Медаль за 10 призовых мест">
+          </div>
+          <!-- другие награды здесь -->
         </div>
 
 
