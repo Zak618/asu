@@ -1,8 +1,12 @@
-RewriteEngine On
+<IfModule mod_rewrite.c>
+    RewriteEngine On
 
-# Если файл или папка существуют, то их не обрабатывать через .htaccess
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
+    # Блокируем доступ к файлам с расширением .php напрямую
+    RewriteCond %{THE_REQUEST} \.php[\s?] [NC]
+    RewriteRule ^ - [F,L]
 
-# Переписывать все запросы к index.php
-RewriteRule ^(.*)$ index.php [QSA,L]
+    # Перенаправление для "красивых" URL
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^(.*)$ index.php?path=$1 [L,QSA]
+</IfModule>

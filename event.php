@@ -2,8 +2,15 @@
 include_once "./base/header.php";
 include_once "./database/db.php";
 
+if (!isset($_SESSION['user_id'])) {
+    echo "<div class='container mt-5'><div class='alert alert-danger text-center'><i class='fas fa-exclamation-triangle'></i> Пожалуйста, авторизуйтесь для просмотра мероприятия!</div></div>";
+    include_once "./base/footer.php";
+    exit;
+}
+
 if (!isset($_GET['id'])) {
-    echo "Мероприятие не найдено!";
+    echo "<div class='container mt-5'><div class='alert alert-danger text-center'><i class='fas fa-exclamation-circle'></i> Мероприятие не найдено!</div></div>";
+    include_once "./base/footer.php";
     exit;
 }
 
@@ -15,7 +22,8 @@ $result = mysqli_query($conn, $sql);
 if ($result && mysqli_num_rows($result) > 0) {
     $event = mysqli_fetch_assoc($result);
 } else {
-    echo "Мероприятие не найдено!";
+    echo "<div class='container mt-5'><div class='alert alert-danger text-center'><i class='fas fa-exclamation-circle'></i> Мероприятие не найдено!</div></div>";
+    include_once "./base/footer.php";
     exit;
 }
 
@@ -93,12 +101,13 @@ $certificate = mysqli_fetch_assoc($certificate_result);
                                     <p class="mr-2 mb-0"><i class="fas fa-hourglass-half"></i> Статус: На рассмотрении</p>
                                     <button class="btn btn-danger delete-certificate-btn m-2" data-certificate-id="<?php echo $certificate['id']; ?>"><i class="fas fa-trash-alt"></i> Удалить сертификат</button>
                                 </div>
-
                             <?php endif; ?>
                         <?php else : ?>
                             <button class="btn btn-primary certificate-btn m-2" data-event-id="<?php echo $event_id; ?>" data-toggle="modal" data-target="#uploadModal"><i class="fas fa-file-upload"></i> Загрузить сертификат</button>
                             <button class="btn btn-danger cancel-btn m-2" data-event-id="<?php echo $event_id; ?>"><i class="fas fa-times-circle"></i> Отменить участие</button>
                         <?php endif; ?>
+                    <?php else : ?>
+                        <div class='alert alert-info text-center w-100'><i class='fas fa-info-circle'></i> Вы еще не участвуете в этом мероприятии.</div>
                     <?php endif; ?>
                 </div>
             </div>
@@ -141,7 +150,7 @@ $certificate = mysqli_fetch_assoc($certificate_result);
 </div>
 
 <!-- Модальное окно для удаления сертификата -->
-<div class="modal fade" id="deleteCertificateModal" tabindex="-1" role="dialog" aria-labelledby="deleteCertificateModalLabel" aria-hidden="true">
+<div class="modal fade" id="deleteCertificateModal" tabindex-1" role="dialog" aria-labelledby="deleteCertificateModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -195,7 +204,7 @@ $certificate = mysqli_fetch_assoc($certificate_result);
             formData.append('event_id', '<?php echo $event_id; ?>');
             formData.append('student_id', '<?php echo $student_id; ?>');
 
-            fetch('./database/upload_certificate.php', {
+            fetch('/database/upload_certificate.php', {
                     method: 'POST',
                     body: formData
                 })
@@ -213,7 +222,7 @@ $certificate = mysqli_fetch_assoc($certificate_result);
         });
 
         function cancelParticipation(eventId) {
-            fetch('./database/participate.php', {
+            fetch('/database/participate.php', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -226,7 +235,7 @@ $certificate = mysqli_fetch_assoc($certificate_result);
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        window.location.href = 'events.php';
+                        window.location.href = '../events';
                     } else {
                         alert('Произошла ошибка: ' + data.error);
                     }
@@ -236,7 +245,7 @@ $certificate = mysqli_fetch_assoc($certificate_result);
 
         function deleteCertificate(certificateId) {
             console.log("Sending delete request for certificate ID: ", certificateId); // Debugging log
-            fetch('./database/delete_certificate.php', {
+            fetch('/database/delete_certificate.php', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'

@@ -2,6 +2,12 @@
 include_once "./base/header.php";
 include_once "./database/db.php";
 
+if (!isset($_SESSION['user_id'])) {
+    header("Location: login");
+    exit();
+  }
+  
+
 // Получаем активную вкладку из GET-параметра, если она не установлена, по умолчанию показываем все мероприятия
 $active_tab = isset($_GET['tab']) ? $_GET['tab'] : 'all';
 

@@ -43,10 +43,10 @@ session_start();
                 <?php if ($_SESSION['role'] == 1) : ?>
                   <span class="balance-text"><?php echo htmlspecialchars($_SESSION['balance']); ?></span>
                 <?php endif; ?>
-                <a href="logout.php" class="btn btn-outline-danger me-2">Выйти</a>
+                <a href="../logout.php" class="btn btn-outline-danger me-2">Выйти</a>
               </div>
             <?php else : ?>
-              <a href="login.php" class="btn btn-outline-primary me-2">Войти</a>
+              <a href="../login" class="btn btn-outline-primary me-2">Войти</a>
             <?php endif; ?>
           </li>
         </ul>
@@ -60,7 +60,7 @@ session_start();
             <a href="logout.php" class="btn btn-outline-danger me-2">Выйти</a>
           </div>
         <?php else : ?>
-          <a href="login.php" class="btn btn-outline-primary me-2">Войти</a>
+          <a href="../login" class="btn btn-outline-primary me-2">Войти</a>
         <?php endif; ?>
       </div>
     </header>

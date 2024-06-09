@@ -5,7 +5,7 @@ include_once "./database/db.php";
 include_once "./database/market_db.php";
 
 if (!isset($_SESSION['moderator_id'])) {
-    header("Location: moderator_login_form.php");
+    header("Location: admin");
     exit();
 }
 

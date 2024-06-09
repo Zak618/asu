@@ -1,8 +1,39 @@
 <?php
+// Функция для безопасного вывода данных
+function safe_output($data) {
+    return htmlspecialchars($data, ENT_QUOTES, 'UTF-8');
+}
+
+// Функция для валидации и нормализации путей
+function validate_path($path) {
+    $path = trim($path, '/');
+    $path = explode('?', $path, 2)[0];
+    $path = filter_var($path, FILTER_SANITIZE_URL);
+    return $path;
+}
+
+// Проверка заблокированных IP-адресов
+function is_ip_blocked($ip) {
+    $blocked_ips = include './database/blocked_ips.php';
+    return in_array($ip, $blocked_ips);
+}
+
+// Проверка, находится ли IP-адрес в черном списке
+if (is_ip_blocked($_SERVER['REMOTE_ADDR'])) {
+    header('HTTP/1.0 403 Forbidden');
+    echo 'Access denied';
+    exit;
+}
+
 // Получаем запрашиваемый путь
-$request = $_SERVER['REQUEST_URI'];
-$request = trim($request, '/');
-$request = explode('?', $request, 2)[0];
+$request = validate_path($_SERVER['REQUEST_URI']);
+
+// Проверка на наличие расширения .php в запросе
+if (preg_match('/\.php$/', $request)) {
+    header('HTTP/1.0 403 Forbidden');
+    echo 'Access denied';
+    exit;
+}
 
 // Обрабатываем маршруты
 switch ($request) {
@@ -23,7 +54,7 @@ switch ($request) {
         require __DIR__ . '/events.php';
         break;
     case (preg_match('/^event\/(\d+)$/', $request, $matches) ? true : false):
-        $_GET['id'] = $matches[1];
+        $_GET['id'] = intval($matches[1]);
         require __DIR__ . '/event.php';
         break;
     case 'market':
@@ -44,3 +75,4 @@ switch ($request) {
         require __DIR__ . '/404.php';
         break;
 }
+?>

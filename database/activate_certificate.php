@@ -1,6 +1,12 @@
 <?php
 include_once "db.php";
 
+if (!defined('ACCESS_ALLOWED')) {
+    header('HTTP/1.0 403 Forbidden');
+    echo 'Access denied';
+    exit;
+}
+
 $coupon_id = $_POST['coupon_id'];
 $teacher_id = $_POST['teacher_id'];
 

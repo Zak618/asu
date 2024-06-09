@@ -31,9 +31,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $_SESSION['role'] = $user['role'];
             
             if ($user['role'] == 2) {
-                header("Location: ../teacher_coupons.php");
+                header("Location: ../teacher_coupons");
             } else {
-                header("Location: ../profile.php");
+                header("Location: ../profile");
             }
             exit();
         } else {

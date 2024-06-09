@@ -3,7 +3,7 @@ include_once "./base/header.php";
 include_once "./database/db.php";
 
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 2) {
-    header("Location: login.php");
+    header("Location: login");
     exit();
 }
 
