@@ -25,6 +25,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 JOIN users u ON c.user_id = u.id 
                 WHERE c.id = ?";
         $stmt = $conn->prepare($sql);
+        if (!$stmt) {
+            echo json_encode(['success' => false, 'error' => 'Ошибка подготовки запроса: ' . $conn->error]);
+            exit;
+        }
         $stmt->bind_param("i", $certificate_id);
         $stmt->execute();
         $result = $stmt->get_result();
@@ -49,11 +53,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Обновляем статус сертификата и количество начисленных баллов
         $sql = "UPDATE certificate SET moderator_status = ?, points_awarded = ?, moderator_comment = ? WHERE id = ?";
         $stmt = $conn->prepare($sql);
+        if (!$stmt) {
+            echo json_encode(['success' => false, 'error' => 'Ошибка подготовки запроса: ' . $conn->error]);
+            exit;
+        }
         $stmt->bind_param("sisi", $status, $points_awarded, $comment, $certificate_id);
     } else {
         // Обновляем только статус и комментарий, если статус "отклонено"
         $sql = "UPDATE certificate SET moderator_status = ?, moderator_comment = ? WHERE id = ?";
-        $stmt->prepare($sql);
+        $stmt = $conn->prepare($sql);
+        if (!$stmt) {
+            echo json_encode(['success' => false, 'error' => 'Ошибка подготовки запроса: ' . $conn->error]);
+            exit;
+        }
         $stmt->bind_param("ssi", $status, $comment, $certificate_id);
     }
 
@@ -64,8 +76,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $user_id = $certificate['user_id'];
             $sql = "UPDATE users SET balance = ? WHERE id = ?";
             $stmt = $conn->prepare($sql);
+            if (!$stmt) {
+                echo json_encode(['success' => false, 'error' => 'Ошибка подготовки запроса: ' . $conn->error]);
+                exit;
+            }
             $stmt->bind_param("ii", $new_balance, $user_id);
-            
+
             if ($stmt->execute()) {
                 echo json_encode(['success' => true, 'balance' => $new_balance]);
             } else {

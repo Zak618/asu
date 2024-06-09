@@ -17,14 +17,22 @@ if ($result && mysqli_num_rows($result) > 0) {
 
 $currentYear = date("Y");
 
-$student_id = $_SESSION['user_id']; // Идентификатор студента из сессии
-$participation_sql = "SELECT e.* FROM event e JOIN event_participation ep ON e.id = ep.event_id WHERE ep.student_id = $student_id ORDER BY e.start_date ASC";
-$participation_result = mysqli_query($conn, $participation_sql);
+$student_id = $_SESSION['user_id'] ?? null; // Идентификатор студента из сессии
 
 $my_events = [];
-if ($participation_result && mysqli_num_rows($participation_result) > 0) {
-    while ($row = mysqli_fetch_assoc($participation_result)) {
-        $my_events[] = $row;
+if ($student_id) {
+    $participation_sql = "SELECT e.* FROM event e JOIN event_participation ep ON e.id = ep.event_id WHERE ep.student_id = ? ORDER BY e.start_date ASC";
+    if ($stmt = mysqli_prepare($conn, $participation_sql)) {
+        mysqli_stmt_bind_param($stmt, "i", $student_id);
+        mysqli_stmt_execute($stmt);
+        $participation_result = mysqli_stmt_get_result($stmt);
+
+        if ($participation_result && mysqli_num_rows($participation_result) > 0) {
+            while ($row = mysqli_fetch_assoc($participation_result)) {
+                $my_events[] = $row;
+            }
+        }
+        mysqli_stmt_close($stmt);
     }
 }
 
@@ -73,10 +81,10 @@ if ($participation_result && mysqli_num_rows($participation_result) > 0) {
                     <?php else: ?>
                         <ul class="list-unstyled">
                             <?php foreach ($my_events as $event): ?>
-                                <a href="event.php?id=<?php echo $event['id']; ?>"><li class="event-item"><?php echo htmlspecialchars($event['title']); ?></li></a>
+                                <a href="event/<?php echo $event['id']; ?>"><li class="event-item"><?php echo htmlspecialchars($event['title']); ?></li></a>
                             <?php endforeach; ?>
                         </ul>
-                        <a href="events.php?tab=my" class="btn btn-light btn-more">Смотреть еще...</a>
+                        <a href="events?tab=my" class="btn btn-light btn-more">Смотреть еще...</a>
                     <?php endif; ?>
                 </div>
             </div>

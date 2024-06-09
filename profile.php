@@ -2,10 +2,9 @@
 include_once "./base/header.php";
 include_once "./database/check_user_data.php";
 
-session_start();
 
 if (!isset($_SESSION['user_id'])) {
-  header("Location: login.php");
+  header("Location: login");
   exit();
 }
 

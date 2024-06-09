@@ -18,7 +18,7 @@ session_start();
 <body>
   <div class="container">
     <header class="navbar navbar-expand-lg navbar-light py-3 mb-4">
-      <a class="navbar-brand" href="../start.php"><span class="fs-4"><span class="text-primary">Э</span>верест</span></a>
+      <a class="navbar-brand" href="../start"><span class="fs-4"><span class="text-primary">Э</span>верест</span></a>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
@@ -26,13 +26,13 @@ session_start();
         <ul class="navbar-nav">
           <?php if (isset($_SESSION['user_id']) && $_SESSION['role'] == 1) : ?>
             <li class="nav-item">
-              <a class="nav-link px-2 link-dark" href="../profile.php">Профиль</a>
+              <a class="nav-link px-2 link-dark" href="../profile">Профиль</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link px-2 link-dark" href="../events.php">Мероприятия</a>
+              <a class="nav-link px-2 link-dark" href="../events">Мероприятия</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link px-2 link-dark" href="../market.php">Маркет</a>
+              <a class="nav-link px-2 link-dark" href="../market">Маркет</a>
             </li>
           <?php endif; ?>
         </ul>
