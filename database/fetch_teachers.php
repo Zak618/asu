@@ -1,7 +1,7 @@
 <?php
 include_once "db.php";
 
-$sql = "SELECT id, first_name, last_name FROM users WHERE role = 2";
+$sql = "SELECT id, first_name, last_name, middle_name FROM users WHERE role = 2";
 $result = $conn->query($sql);
 
 $teachers = [];

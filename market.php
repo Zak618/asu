@@ -211,26 +211,34 @@ $user_id = $_SESSION['user_id'];
         // Функция для форматирования даты на русский
         function formatDateTime(dateString) {
             const date = new Date(dateString);
-    date.setHours(date.getHours() + 3); // Добавляем 3 часа для московского времени
-    const options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
-    return date.toLocaleDateString('ru-RU', options);
-}
+            date.setHours(date.getHours() + 3); // Добавляем 3 часа для московского времени
+            const options = {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            };
+            return date.toLocaleDateString('ru-RU', options);
+        }
 
 
-    // Загрузка истории обмена
-    $.ajax({
-        url: './database/fetch_exchange_history.php',
-        method: 'GET',
-        data: { user_id: <?php echo $user_id; ?> },
-        success: function(data) {
-            const exchangeHistory = JSON.parse(data);
-            exchangeHistory.forEach(entry => {
-                const operationType = entry.teacher_name 
-                    ? `<i class="icon fas fa-check-circle"></i>Активировано у: ${entry.teacher_name}` 
-                    : `<i class="icon fas fa-shopping-cart"></i>Куплено`;
-                const cardClass = entry.status === 'активно' ? 'exchange-card' : 'exchange-card inactive';
-                
-                $('#exchangeHistoryList').append(`
+        // Загрузка истории обмена
+        $.ajax({
+            url: './database/fetch_exchange_history.php',
+            method: 'GET',
+            data: {
+                user_id: <?php echo $user_id; ?>
+            },
+            success: function(data) {
+                const exchangeHistory = JSON.parse(data);
+                exchangeHistory.forEach(entry => {
+                    const operationType = entry.teacher_name ?
+                        `<i class="icon fas fa-check-circle"></i>Активировано у: ${entry.teacher_name}` :
+                        `<i class="icon fas fa-shopping-cart"></i>Куплено`;
+                    const cardClass = entry.status === 'активно' ? 'exchange-card' : 'exchange-card inactive';
+
+                    $('#exchangeHistoryList').append(`
                     <div class="${cardClass}">
                         <h5><i class="icon fas fa-ticket-alt"></i>${entry.item_name}</h5>
                         <p class="date">Дата и время: ${formatDateTime(entry.purchase_date)}</p>
@@ -238,12 +246,12 @@ $user_id = $_SESSION['user_id'];
                         <p class="operation-type">${operationType}</p>
                     </div>
                 `);
-            });
-        },
-        error: function(err) {
-            console.error('Error loading exchange history:', err);
-        }
-    });
+                });
+            },
+            error: function(err) {
+                console.error('Error loading exchange history:', err);
+            }
+        });
         // Обработка подтверждения активации
         $('#confirmActivateBtn').click(function() {
             const couponId = $('#couponId').val();

@@ -12,18 +12,6 @@ function validate_path($path) {
     return $path;
 }
 
-// Проверка заблокированных IP-адресов
-function is_ip_blocked($ip) {
-    $blocked_ips = include './database/blocked_ips.php';
-    return in_array($ip, $blocked_ips);
-}
-
-// Проверка, находится ли IP-адрес в черном списке
-if (is_ip_blocked($_SERVER['REMOTE_ADDR'])) {
-    header('HTTP/1.0 403 Forbidden');
-    echo 'Access denied';
-    exit;
-}
 
 // Получаем запрашиваемый путь
 $request = validate_path($_SERVER['REQUEST_URI']);

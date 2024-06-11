@@ -1,16 +1,10 @@
 <?php
 include_once "db.php";
 
-if (!defined('ACCESS_ALLOWED')) {
-    header('HTTP/1.0 403 Forbidden');
-    echo 'Access denied';
-    exit;
-}
-
 $coupon_id = $_POST['coupon_id'];
 $teacher_id = $_POST['teacher_id'];
 
-$sql = "UPDATE history_market SET status = 'Неактивно', teacher_id = ? WHERE id = ?";
+$sql = "UPDATE history_market SET status = 'Неактивно', teacher_id = ?, purchase_date = DATE_SUB(NOW(), INTERVAL 3 HOUR) WHERE id = ?";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("ii", $teacher_id, $coupon_id);
 
