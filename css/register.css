@@ -1,0 +1,22 @@
+.iti {
+    width: 100%;
+}
+
+.iti__flag-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.intl-tel-input .form-control {
+    border-radius: .25rem;
+    border: 1px solid #ced4da;
+    padding: .375rem .75rem;
+    width: 100%;
+}
+
+.intl-tel-input .form-control:focus {
+    border-color: #80bdff;
+    outline: 0;
+    box-shadow: 0 0 0 .2rem rgba(0, 123, 255, .25);
+}

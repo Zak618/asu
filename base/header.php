@@ -13,6 +13,7 @@ session_start();
   <link rel="stylesheet" href="../css/profile.css">
   <link rel="stylesheet" href="../css/events.css">
   <link rel="stylesheet" href="../css/market.css">
+  <link rel="stylesheet" href="../css/register.css">
 </head>
 
 <body>
