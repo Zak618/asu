@@ -14,6 +14,17 @@ session_start();
   <link rel="stylesheet" href="../css/events.css">
   <link rel="stylesheet" href="../css/market.css">
   <link rel="stylesheet" href="../css/register.css">
+  <style>
+    body {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    .container.flex-grow-1 {
+      flex-grow: 1;
+    }
+  </style>
 </head>
 
 <body>
@@ -66,5 +77,5 @@ session_start();
       </div>
     </header>
   </div>
-</body>
-</html>
+  <div class="container flex-grow-1">
+    <!-- Основное содержимое страницы -->

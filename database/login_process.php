@@ -2,6 +2,8 @@
 include_once "db.php";
 session_start();
 
+header('Content-Type: application/json');
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email = $_POST['email'];
     $password = $_POST['password'];
@@ -30,17 +32,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $_SESSION['phone_number'] = $user['phone_number'];
             $_SESSION['role'] = $user['role'];
             
-            if ($user['role'] == 2) {
-                header("Location: ../teacher_coupons");
-            } else {
-                header("Location: ../profile");
-            }
-            exit();
+            $redirect = $user['role'] == 2 ? '../teacher_coupons' : '../profile';
+            echo json_encode(['status' => 'success', 'redirect' => $redirect]);
         } else {
-            echo "Неверный пароль или у вас нет доступа.";
+            echo json_encode(['status' => 'error', 'message' => 'Неверный пароль или email.']);
         }
     } else {
-        echo "Пользователь с таким email не найден.";
+        echo json_encode(['status' => 'error', 'message' => 'Пользователь с таким email не найден.']);
     }
 
     $stmt->close();
