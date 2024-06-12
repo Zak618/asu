@@ -8,6 +8,10 @@ include_once "./database/db.php";
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 
 <style>
+.form-control, .input-group-text, .form-text, .invalid-feedback {
+    font-size: 0.875rem; /* Small font size */
+    font-family: 'Arial', sans-serif; /* Minimalist font */
+}
 .input-group-text {
     cursor: pointer;
 }
@@ -18,29 +22,29 @@ include_once "./database/db.php";
         <div class="col-md-8 col-lg-6">
             <div class="registration-form">
                 <h2 class="text-center mb-4">Регистрация</h2>
-                <form id="registrationForm" action="./database/register_process.php" method="POST">
+                <form id="registrationForm" method="POST">
                     <div class="mb-3">
                         <label for="firstName" class="form-label">Имя</label>
-                        <input type="text" class="form-control" id="firstName" name="firstName" maxlength="25" required>
+                        <input type="text" class="form-control" id="firstName" name="firstName" maxlength="25" required placeholder="Иван">
                         <div class="invalid-feedback" id="firstNameError"></div>
                     </div>
                     <div class="mb-3">
                         <label for="lastName" class="form-label">Фамилия</label>
-                        <input type="text" class="form-control" id="lastName" name="lastName" maxlength="25" required>
+                        <input type="text" class="form-control" id="lastName" name="lastName" maxlength="25" required placeholder="Иванов">
                         <div class="invalid-feedback" id="lastNameError"></div>
                     </div>
                     <div class="mb-3">
                         <label for="middleName" class="form-label">Отчество</label>
-                        <input type="text" class="form-control" id="middleName" name="middleName" maxlength="25">
+                        <input type="text" class="form-control" id="middleName" name="middleName" maxlength="25" placeholder="Иванович">
                         <div class="invalid-feedback" id="middleNameError"></div>
                     </div>
                     <div class="mb-3">
                         <label for="groupName" class="form-label">Группа</label>
-                        <input type="text" class="form-control" id="groupName" name="groupName" required>
+                        <input type="text" class="form-control" id="groupName" name="groupName" required placeholder="АС-20-1">
                     </div>
                     <div class="mb-3">
                         <label for="email" class="form-label">Email</label>
-                        <input type="email" class="form-control" id="email" name="email" required>
+                        <input type="email" class="form-control" id="email" name="email" required placeholder="example@asu.ru">
                         <div class="invalid-feedback" id="emailError"></div>
                     </div>
                     <div class="mb-3">
@@ -71,6 +75,12 @@ include_once "./database/db.php";
                     </div>
                     <button type="submit" class="btn btn-primary w-100">Зарегистрироваться</button>
                 </form>
+                <div class="alert alert-danger mt-3 d-none" id="validationAlert">
+                    Пожалуйста, заполните все поля корректно.
+                </div>
+                <div class="alert alert-success mt-3 d-none" id="successMessage">
+                    Регистрация успешна! <a href="login.php">Перейти на страницу авторизации</a>.
+                </div>
             </div>
         </div>
     </div>
@@ -78,6 +88,9 @@ include_once "./database/db.php";
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('registrationForm');
+    const validationAlert = document.getElementById('validationAlert');
+    const successMessage = document.getElementById('successMessage');
     const firstName = document.getElementById('firstName');
     const lastName = document.getElementById('lastName');
     const middleName = document.getElementById('middleName');
@@ -176,11 +189,19 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    function generateRandomPassword() {
-        const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()";
+    function generateStrongPassword() {
+        const upper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        const lower = "abcdefghijklmnopqrstuvwxyz";
+        const numbers = "0123456789";
+        const symbols = "!@#$%^&*()";
+        const allChars = upper + lower + numbers + symbols;
         let password = "";
-        for (let i = 0; i < 12; i++) {
-            password += chars.charAt(Math.floor(Math.random() * chars.length));
+        password += upper.charAt(Math.floor(Math.random() * upper.length));
+        password += lower.charAt(Math.floor(Math.random() * lower.length));
+        password += numbers.charAt(Math.floor(Math.random() * numbers.length));
+        password += symbols.charAt(Math.floor(Math.random() * symbols.length));
+        for (let i = 4; i < 12; i++) {
+            password += allChars.charAt(Math.floor(Math.random() * allChars.length));
         }
         return password;
     }
@@ -196,7 +217,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     generatePasswordButton.addEventListener('click', () => {
-        const newPassword = generateRandomPassword();
+        const newPassword = generateStrongPassword();
         password.value = newPassword;
         confirmPassword.value = newPassword;
         checkPasswordStrength();
@@ -257,6 +278,54 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!iti.isValidNumber()) {
             phoneNumber.classList.add('is-invalid');
             phoneNumberError.textContent = 'Введите действительный номер телефона.';
+        }
+    });
+
+    form.addEventListener('submit', function(event) {
+        let isValid = true;
+        
+        // Validate each field
+        validateField(firstName, 'firstNameError', /^[^\d\s][\D]*$/, 25);
+        validateField(lastName, 'lastNameError', /^[^\d\s][\D]*$/, 25);
+        validateField(middleName, 'middleNameError', /^[^\d\s][\D]*$/, 25);
+        validateEmail();
+        validatePasswordMatch();
+
+        // Check if any field has the 'is-invalid' class
+        const fields = [firstName, lastName, middleName, email, phoneNumber, password, confirmPassword];
+        fields.forEach(field => {
+            if (field.classList.contains('is-invalid')) {
+                isValid = false;
+            }
+        });
+
+        if (!isValid) {
+            event.preventDefault();
+            validationAlert.classList.remove('d-none');
+        } else {
+            validationAlert.classList.add('d-none');
+            
+            // Отправка формы через AJAX
+            event.preventDefault();
+            const formData = new FormData(form);
+            fetch('./database/register_process.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    form.reset();
+                    successMessage.classList.remove('d-none');
+                } else {
+                    validationAlert.classList.remove('d-none');
+                    validationAlert.innerHTML = data.messages.join('<br>');
+                }
+            })
+            .catch(error => {
+                validationAlert.classList.remove('d-none');
+                validationAlert.innerHTML = 'Произошла ошибка при регистрации. Попробуйте еще раз.';
+            });
         }
     });
 });
