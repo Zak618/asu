@@ -18,7 +18,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             if ($user['role'] == 3) { // Проверка роли
                 $_SESSION['moderator_id'] = $user['id'];
                 $_SESSION['moderator_email'] = $user['email'];
-                header("Location: ../admin_dashboard.php");
+                $_SESSION['role'] = $user['role'];
+                header("Location: ../admin_dashboard");
+                exit();
+            } elseif ($user['role'] == 4) { // Проверка роли
+                $_SESSION['moderator_id'] = $user['id'];
+                $_SESSION['moderator_email'] = $user['email'];
+                $_SESSION['role'] = $user['role'];
+                header("Location: ../moderator_dashboard");
                 exit();
             } else {
                 echo "У вас нет прав доступа.";

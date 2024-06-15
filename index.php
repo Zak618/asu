@@ -65,6 +65,9 @@ switch ($request) {
     case 'reset_password':
         require __DIR__ . '/reset_password.php';
         break;
+    case 'moderator_dashboard':
+        require __DIR__ . '/moderator_dashboard.php';
+        break;
         // Добавьте другие маршруты по необходимости
     default:
         http_response_code(404);

@@ -14,7 +14,7 @@ session_start();
     <div class="row justify-content-center">
         <div class="col-md-6 col-lg-4">
             <div class="login-form">
-                <h2 class="text-center mb-4">Авторизация модератора</h2>
+                <h2 class="text-center mb-4">Авторизация</h2>
                 <form action="../database/admin_login.php" method="POST">
                     <div class="mb-3">
                         <label for="email" class="form-label">Email</label>

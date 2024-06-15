@@ -136,14 +136,14 @@ $rejectedCertificates = getCertificatesByStatus('отклонено', $conn);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="./css/admin_dashboard.css">
-    <title>Панель модератора</title>
+    <title>Панель администратора</title>
 </head>
 
 <body>
 
     <div class="container mt-4">
         <div class="d-flex justify-content-between align-items-center mb-3">
-            <h2 class="mb-0">Панель модератора</h2>
+            <h2 class="mb-0">Панель администратора</h2>
             <a href="./admin_logout.php" class="btn btn-danger">Выйти</a>
         </div>
         <ul class="nav nav-tabs" id="moderatorTabs" role="tablist">
