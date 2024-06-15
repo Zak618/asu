@@ -30,7 +30,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $_SESSION['profile'] = $user['profile'];
                 $_SESSION['moderator_status'] = $user['moderator_status'];
                 $_SESSION['moderator_comment'] = $user['moderator_comment'];
-                $_SESSION['phone_number'] = $user['phone_number'];
                 $_SESSION['role'] = $user['role'];
                 
                 $redirect = $user['role'] == 2 ? '../teacher_coupons' : '../profile';

@@ -13,18 +13,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $last_name = $_POST['last_name'];
     $middle_name = $_POST['middle_name'];
     $email = $_POST['email'];
-    $phone_number = $_POST['phone_number'];
     $password = $_POST['password'];
 
     if ($password) {
         $password_hashed = password_hash($password, PASSWORD_BCRYPT);
-        $sql = "UPDATE users SET first_name = ?, last_name = ?, middle_name = ?, email = ?, phone_number = ?, password = ? WHERE id = ? AND role = 2";
+        $sql = "UPDATE users SET first_name = ?, last_name = ?, middle_name = ?, email = ?, password = ? WHERE id = ? AND role = 2";
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param("ssssssi", $first_name, $last_name, $middle_name, $email, $phone_number, $password_hashed, $id);
+        $stmt->bind_param("sssssi", $first_name, $last_name, $middle_name, $email, $password_hashed, $id);
     } else {
-        $sql = "UPDATE users SET first_name = ?, last_name = ?, middle_name = ?, email = ?, phone_number = ? WHERE id = ? AND role = 2";
+        $sql = "UPDATE users SET first_name = ?, last_name = ?, middle_name = ?, email = ? WHERE id = ? AND role = 2";
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param("sssssi", $first_name, $last_name, $middle_name, $email, $phone_number, $id);
+        $stmt->bind_param("ssssi", $first_name, $last_name, $middle_name, $email, $id);
     }
 
     if ($stmt->execute()) {

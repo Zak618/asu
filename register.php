@@ -54,11 +54,6 @@ if (isset($_SESSION['user_id'])) {
                         <div class="invalid-feedback" id="emailError"></div>
                     </div>
                     <div class="mb-3">
-                        <label for="phoneNumber" class="form-label">Номер телефона</label>
-                        <input type="tel" class="form-control" id="phoneNumber" name="phoneNumber" required>
-                        <div class="invalid-feedback" id="phoneNumberError"></div>
-                    </div>
-                    <div class="mb-3">
                         <label for="password" class="form-label">Пароль</label>
                         <div class="input-group">
                             <input type="password" class="form-control" id="password" name="password" required>
@@ -101,7 +96,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const lastName = document.getElementById('lastName');
     const middleName = document.getElementById('middleName');
     const email = document.getElementById('email');
-    const phoneNumber = document.getElementById('phoneNumber');
     const password = document.getElementById('password');
     const confirmPassword = document.getElementById('confirmPassword');
     const passwordStrength = document.getElementById('passwordStrength');
@@ -124,7 +118,10 @@ document.addEventListener('DOMContentLoaded', function() {
         field.classList.remove('is-invalid');
         errorMsg.textContent = '';
 
-        if (!regex.test(field.value) || field.value.length > maxLength) {
+        if (!field.value) {
+            field.classList.add('is-invalid');
+            errorMsg.textContent = 'Поле не должно быть пустым.';
+        } else if (!regex.test(field.value) || field.value.length > maxLength) {
             field.classList.add('is-invalid');
             if (field.value.length > maxLength) {
                 errorMsg.textContent = `Поле не должно превышать ${maxLength} символов.`;
@@ -264,29 +261,6 @@ document.addEventListener('DOMContentLoaded', function() {
     lastName.addEventListener('blur', () => validateField(lastName, 'lastNameError', /^[^\d\s][\D]*$/, 25));
     middleName.addEventListener('blur', () => validateField(middleName, 'middleNameError', /^[^\d\s][\D]*$/, 25));
 
-    // Initialize intl-tel-input
-    const iti = window.intlTelInput(phoneNumber, {
-        initialCountry: "auto",
-        geoIpLookup: function(callback) {
-            fetch('https://ipinfo.io/json')
-                .then(response => response.json())
-                .then(data => callback(data.country))
-                .catch(() => callback('us'));
-        },
-        utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js"
-    });
-
-    phoneNumber.addEventListener('blur', function() {
-        const phoneNumberError = document.getElementById('phoneNumberError');
-        phoneNumber.classList.remove('is-invalid');
-        phoneNumberError.textContent = '';
-
-        if (!iti.isValidNumber()) {
-            phoneNumber.classList.add('is-invalid');
-            phoneNumberError.textContent = 'Введите действительный номер телефона.';
-        }
-    });
-
     form.addEventListener('submit', function(event) {
         let isValid = true;
         
@@ -298,7 +272,7 @@ document.addEventListener('DOMContentLoaded', function() {
         validatePasswordMatch();
 
         // Check if any field has the 'is-invalid' class
-        const fields = [firstName, lastName, middleName, email, phoneNumber, password, confirmPassword];
+        const fields = [firstName, lastName, middleName, email, password, confirmPassword];
         fields.forEach(field => {
             if (field.classList.contains('is-invalid')) {
                 isValid = false;

@@ -62,7 +62,7 @@ $marketItems = getMarketItems($conn);
 
 function getStudentsByStatus($status, $conn)
 {
-    $sql = "SELECT * FROM users WHERE moderator_status = ?";
+    $sql = "SELECT * FROM users WHERE moderator_status = ? AND role != 2";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("i", $status);
     $stmt->execute();
@@ -83,7 +83,7 @@ function updateStudentStatus($id, $status, $conn, $comment = '')
     $stmt->bind_param("isi", $status, $comment, $id);
     return $stmt->execute();
 }
-// Получение всех мероприятий
+
 function getEvents($conn)
 {
     $sql = "SELECT * FROM event";
@@ -97,7 +97,6 @@ function getEvents($conn)
     return $events;
 }
 
-// Получение сертификатов по статусу
 function getCertificatesByStatus($status, $conn)
 {
     $sql = "SELECT c.*, u.first_name, u.last_name, e.title as event_title 
@@ -117,6 +116,7 @@ function getCertificatesByStatus($status, $conn)
     }
     return $certificates;
 }
+
 $events = getEvents($conn);
 
 $newStudents = getStudentsByStatus(0, $conn);
@@ -126,7 +126,6 @@ $rejectedStudents = getStudentsByStatus(2, $conn);
 $pendingCertificates = getCertificatesByStatus('на рассмотрении', $conn);
 $acceptedCertificates = getCertificatesByStatus('принято', $conn);
 $rejectedCertificates = getCertificatesByStatus('отклонено', $conn);
-
 ?>
 
 <!DOCTYPE html>
@@ -169,7 +168,6 @@ $rejectedCertificates = getCertificatesByStatus('отклонено', $conn);
             <li class="nav-item">
                 <a class="nav-link" id="teachers-tab" data-toggle="tab" href="#teachers" role="tab" aria-controls="teachers" aria-selected="false">Преподаватели</a>
             </li>
-
         </ul>
         <div class="tab-content" id="studentTabsContent">
             <div class="tab-pane fade" id="market" role="tabpanel" aria-labelledby="market-tab">
@@ -221,7 +219,6 @@ $rejectedCertificates = getCertificatesByStatus('отклонено', $conn);
                                         <th>Фамилия</th>
                                         <th>Отчество</th>
                                         <th>Email</th>
-                                        <th>Телефон</th>
                                         <th>Действия</th>
                                     </tr>
                                 </thead>
@@ -262,10 +259,6 @@ $rejectedCertificates = getCertificatesByStatus('отклонено', $conn);
                                     <input type="email" class="form-control" id="teacherEmail" name="email" required>
                                 </div>
                                 <div class="form-group">
-                                    <label for="teacherPhoneNumber">Телефон</label>
-                                    <input type="text" class="form-control" id="teacherPhoneNumber" name="phone_number" required>
-                                </div>
-                                <div class="form-group">
                                     <label for="teacherPassword">Пароль</label>
                                     <input type="password" class="form-control" id="teacherPassword" name="password" required>
                                 </div>
@@ -304,10 +297,6 @@ $rejectedCertificates = getCertificatesByStatus('отклонено', $conn);
                                 <div class="form-group">
                                     <label for="editTeacherEmail">Email</label>
                                     <input type="email" class="form-control" id="editTeacherEmail" name="email" required>
-                                </div>
-                                <div class="form-group">
-                                    <label for="editTeacherPhoneNumber">Телефон</label>
-                                    <input type="text" class="form-control" id="editTeacherPhoneNumber" name="phone_number" required>
                                 </div>
                                 <div class="form-group">
                                     <label for="editTeacherPassword">Пароль</label>
@@ -419,7 +408,6 @@ $rejectedCertificates = getCertificatesByStatus('отклонено', $conn);
                                     <h5 class="card-title"><?php echo htmlspecialchars($student['first_name'] . ' ' . $student['last_name']); ?></h5>
                                     <p class="card-text">Группа: <?php echo htmlspecialchars($student['group_name']); ?></p>
                                     <p class="card-text">Email: <?php echo htmlspecialchars($student['email']); ?></p>
-                                    <p class="card-text">Телефон: <?php echo htmlspecialchars($student['phone_number']); ?></p>
                                     <button class="btn btn-success btn-sm accept-btn" data-id="<?php echo $student['id']; ?>">Принять</button>
                                     <button class="btn btn-danger btn-sm reject-btn" data-id="<?php echo $student['id']; ?>">Отклонить</button>
                                 </div>
@@ -438,7 +426,6 @@ $rejectedCertificates = getCertificatesByStatus('отклонено', $conn);
                                     <h5 class="card-title"><?php echo htmlspecialchars($student['first_name'] . ' ' . $student['last_name']); ?></h5>
                                     <p class="card-text">Группа: <?php echo htmlspecialchars($student['group_name']); ?></p>
                                     <p class="card-text">Email: <?php echo htmlspecialchars($student['email']); ?></p>
-                                    <p class="card-text">Телефон: <?php echo htmlspecialchars($student['phone_number']); ?></p>
                                     <p class="card-text">Код направления: <?php echo htmlspecialchars($student['direction_code']); ?></p>
                                     <p class="card-text">Название направления: <?php echo htmlspecialchars($student['direction_name']); ?></p>
                                     <p class="card-text">Профиль: <?php echo htmlspecialchars($student['profile']); ?></p>
@@ -458,7 +445,6 @@ $rejectedCertificates = getCertificatesByStatus('отклонено', $conn);
                                     <h5 class="card-title"><?php echo htmlspecialchars($student['first_name'] . ' ' . $student['last_name']); ?></h5>
                                     <p class="card-text">Группа: <?php echo htmlspecialchars($student['group_name']); ?></p>
                                     <p class="card-text">Email: <?php echo htmlspecialchars($student['email']); ?></p>
-                                    <p class="card-text">Телефон: <?php echo htmlspecialchars($student['phone_number']); ?></p>
                                     <p class="card-text">Комментарий модератора: <?php echo htmlspecialchars($student['moderator_comment']); ?></p>
                                 </div>
                             </div>
@@ -566,7 +552,6 @@ $rejectedCertificates = getCertificatesByStatus('отклонено', $conn);
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
-
                 </div>
                 <div class="modal-body">
                     <form id="addEventForm">
@@ -641,7 +626,6 @@ $rejectedCertificates = getCertificatesByStatus('отклонено', $conn);
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
-
                 </div>
                 <div class="modal-body">
                     <form id="editEventForm">
@@ -788,8 +772,6 @@ $rejectedCertificates = getCertificatesByStatus('отклонено', $conn);
             </div>
         </div>
     </div>
-
-
 
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
@@ -1041,7 +1023,6 @@ $rejectedCertificates = getCertificatesByStatus('отклонено', $conn);
                 $('#editTeacherLastName').val(teacher.last_name);
                 $('#editTeacherMiddleName').val(teacher.middle_name);
                 $('#editTeacherEmail').val(teacher.email);
-                $('#editTeacherPhoneNumber').val(teacher.phone_number);
                 $('#editTeacherModal').modal('show');
             });
         });

@@ -53,7 +53,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $middleName = $_POST['middleName'] ?? '';
     $groupName = $_POST['groupName'];
     $email = $_POST['email'];
-    $phoneNumber = $_POST['phoneNumber'];
     $password = $_POST['password'];
     $confirmPassword = $_POST['confirmPassword'];
 
@@ -61,12 +60,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $errors = [];
 
     // Проверка имени и фамилии
-    if (preg_match('/\d/', $firstName) || strlen($firstName) > 25) {
+    if (empty($firstName)) {
+        $errors[] = "Поле Имя не должно быть пустым.";
+    } elseif (preg_match('/\d/', $firstName) || strlen($firstName) > 25) {
         $errors[] = "Имя не должно содержать цифры и превышать 25 символов.";
     }
-    if (preg_match('/\d/', $lastName) || strlen($lastName) > 25) {
+    
+    if (empty($lastName)) {
+        $errors[] = "Поле Фамилия не должно быть пустым.";
+    } elseif (preg_match('/\d/', $lastName) || strlen($lastName) > 25) {
         $errors[] = "Фамилия не должна содержать цифры и превышать 25 символов.";
     }
+
     if (!empty($middleName) && (preg_match('/\d/', $middleName) || strlen($middleName) > 25)) {
         $errors[] = "Отчество не должно содержать цифры и превышать 25 символов.";
     }
@@ -86,8 +91,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stmt->close();
     }
 
-    // Проверка совпадения паролей
-    if ($password !== $confirmPassword) {
+    // Проверка пароля
+    if (empty($password)) {
+        $errors[] = "Поле Пароль не должно быть пустым.";
+    } elseif ($password !== $confirmPassword) {
         $errors[] = "Пароли не совпадают.";
     }
 
@@ -112,11 +119,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $token = bin2hex(random_bytes(16));
 
         // Вставка данных пользователя в базу данных
-        $sql = "INSERT INTO users (first_name, last_name, middle_name, group_name, email, phone_number, password, avatar_url, role, email_confirm_token)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        $sql = "INSERT INTO users (first_name, last_name, middle_name, group_name, email, password, avatar_url, role, email_confirm_token)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param("ssssssssss", $firstName, $lastName, $middleName, $groupName, $email, $phoneNumber, $hashedPassword, $avatarUrl, $role, $token);
+        $stmt->bind_param("sssssssss", $firstName, $lastName, $middleName, $groupName, $email, $hashedPassword, $avatarUrl, $role, $token);
 
         if ($stmt->execute()) {
             // Отправка письма с подтверждением

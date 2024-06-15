@@ -2,7 +2,6 @@
 include_once "./base/header.php";
 include_once "./database/check_user_data.php";
 
-
 if (!isset($_SESSION['user_id'])) {
   header("Location: login");
   exit();
@@ -18,7 +17,6 @@ $direction_name = $_SESSION['direction_name'] ?? null;
 $profile = $_SESSION['profile'] ?? null;
 $moderator_status = $_SESSION['moderator_status'] ?? null;
 $moderator_comment = $_SESSION['moderator_comment'] ?? null;
-$phone_number = $_SESSION['phone_number'] ?? null;
 
 $user_data = check_user_data($user_id);
 
@@ -87,11 +85,11 @@ $winner_count = $user_data['winner_count'];
           </div>
 
           <div class="award" data-title="Медаль за 3 активированных купона">
-            <img src="<?php echo ($activated_count >= 3) ? '../images/awards/6a.png' : '../images/awards/6.png'; ?>" alt="Медаль за 3 активированных купона">
+            <img src="<?php echo ($activated_count >= 3) ? '../images/awards/6a.png' : '../images/awards/6.png'; ?>" alt="Медаль за 3 активированных купонов">
           </div>
 
           <div class="award" data-title="Медаль за 10 участий">
-            <img src="<?php echo ($participant_count >= 10) ? '../images/awards/7a.png' : '../images/awards/7.png'; ?>" alt="Медаль за 10 участий">
+            <img src="<?php echo ($participation_count >= 10) ? '../images/awards/7a.png' : '../images/awards/7.png'; ?>" alt="Медаль за 10 участий">
           </div>
 
           <div class="award" data-title="Медаль за 10 призовых мест">
@@ -104,22 +102,20 @@ $winner_count = $user_data['winner_count'];
           <!-- другие награды здесь -->
         </div>
 
-
         <h4 class="mt-3">Статистика моих участий</h4>
         <div class="chart-container">
           <canvas id="participationChart"></canvas>
         </div>
-
-
       </div>
     </div>
   </div>
 </div>
+
 <!-- Модальное окно для редактирования профиля -->
 <div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
-      <form action="./database/update_profile.php" method="POST" enctype="multipart/form-data">
+      <form id="editProfileForm" action="./database/update_profile.php" method="POST" enctype="multipart/form-data">
         <div class="modal-header">
           <h5 class="modal-title" id="editProfileModalLabel">Редактировать профиль</h5>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -130,22 +126,22 @@ $winner_count = $user_data['winner_count'];
           <div class="form-group">
             <label for="firstName">Имя</label>
             <input type="text" class="form-control" id="firstName" name="firstName" value="<?php echo htmlspecialchars($_SESSION['first_name']); ?>" required>
+            <div class="invalid-feedback" id="firstNameError"></div>
           </div>
           <div class="form-group">
             <label for="lastName">Фамилия</label>
             <input type="text" class="form-control" id="lastName" name="lastName" value="<?php echo htmlspecialchars($_SESSION['last_name']); ?>" required>
+            <div class="invalid-feedback" id="lastNameError"></div>
           </div>
           <div class="form-group">
             <label for="email">Email</label>
             <input type="email" class="form-control" id="email" name="email" value="<?php echo htmlspecialchars($user_email); ?>" required>
-          </div>
-          <div class="form-group">
-            <label for="phoneNumber">Номер телефона</label>
-            <input type="text" class="form-control" id="phoneNumber" name="phoneNumber" value="<?php echo htmlspecialchars($phone_number); ?>" required>
+            <div class="invalid-feedback" id="emailError"></div>
           </div>
           <div class="form-group">
             <label for="groupName">Группа</label>
             <input type="text" class="form-control" id="groupName" name="groupName" value="<?php echo htmlspecialchars($group_name); ?>" required>
+            <div class="invalid-feedback" id="groupNameError"></div>
           </div>
           <div class="form-group">
             <label for="avatar">Фотография</label>
@@ -206,7 +202,70 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         })
         .catch(error => console.error('Error fetching data:', error));
+
+    const form = document.getElementById('editProfileForm');
+    form.addEventListener('submit', function(event) {
+        let isValid = true;
+
+        const firstName = document.getElementById('firstName');
+        const lastName = document.getElementById('lastName');
+        const email = document.getElementById('email');
+        const groupName = document.getElementById('groupName');
+
+        // Validation functions
+        function validateField(field, errorMsgId, regex, emptyMessage, digitMessage, lengthMessage, maxLength) {
+            const errorMsg = document.getElementById(errorMsgId);
+            field.classList.remove('is-invalid');
+            errorMsg.textContent = '';
+
+            if (field.value.trim() === '') {
+                field.classList.add('is-invalid');
+                errorMsg.textContent = emptyMessage;
+                isValid = false;
+            } else if (/\d/.test(field.value)) {
+                field.classList.add('is-invalid');
+                errorMsg.textContent = digitMessage;
+                isValid = false;
+            } else if (field.value.length > maxLength) {
+                field.classList.add('is-invalid');
+                errorMsg.textContent = lengthMessage;
+                isValid = false;
+            } else if (!regex.test(field.value)) {
+                field.classList.add('is-invalid');
+                errorMsg.textContent = 'Поле содержит недопустимые символы.';
+                isValid = false;
+            }
+        }
+
+        validateField(firstName, 'firstNameError', /^[^\d\s][\D]*$/, 'Поле имя не должно быть пустым.', 'Поле имя не должно содержать цифры.', 'Поле имя не должно превышать 25 символов.', 25);
+        validateField(lastName, 'lastNameError', /^[^\d\s][\D]*$/, 'Поле фамилия не должно быть пустым.', 'Поле фамилия не должно содержать цифры.', 'Поле фамилия не должно превышать 25 символов.', 25);
+        validateField(email, 'emailError', /^[^\s@]+@[^\s@]+\.[^\s@]+$/, 'Поле email не должно быть пустым.', '', 'Поле email не должно превышать 255 символов.', 255);
+        validateField(groupName, 'groupNameError', /^[^\d\s][\D]*$/, 'Поле группа не должно быть пустым.', 'Поле группа не должно содержать цифры.', 'Поле группа не должно превышать 25 символов.', 25);
+
+        if (!isValid) {
+            event.preventDefault();
+        } else {
+            event.preventDefault();
+            const formData = new FormData(form);
+            fetch('./database/update_profile.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    window.location.href = data.redirect;
+                } else {
+                    alert(data.messages.join('\n'));
+                }
+            })
+            .catch(error => {
+                alert('Произошла ошибка. Попробуйте еще раз.');
+            });
+        }
+    });
 });
+</script>
 
 </script>
 <?php

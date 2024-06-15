@@ -12,15 +12,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $last_name = $_POST['last_name'];
     $middle_name = $_POST['middle_name'];
     $email = $_POST['email'];
-    $phone_number = $_POST['phone_number'];
     $password = password_hash($_POST['password'], PASSWORD_BCRYPT);
     $moderator_status = 1; // Устанавливаем значение по умолчанию
     $role = 2;
 
     // Указываем все необходимые столбцы и значения
-    $sql = "INSERT INTO users (first_name, last_name, middle_name, email, phone_number, password, moderator_status, role) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+    $sql = "INSERT INTO users (first_name, last_name, middle_name, email, password, moderator_status, role) VALUES (?, ?, ?, ?, ?, ?, ?)";
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("ssssssii", $first_name, $last_name, $middle_name, $email, $phone_number, $password, $moderator_status, $role);
+    $stmt->bind_param("sssssii", $first_name, $last_name, $middle_name, $email, $password, $moderator_status, $role);
 
     if ($stmt->execute()) {
         echo json_encode(['success' => true]);
