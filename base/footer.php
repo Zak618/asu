@@ -2,7 +2,7 @@
   <div class="container">
     <footer class="d-flex flex-wrap justify-content-between align-items-center py-3 my-4">
       <div class="col-12 col-md-4 d-flex flex-column align-items-center align-items-md-start text-center text-md-left mb-3 mb-md-0">
-        <span class="text-muted">&copy; 2024 ASU</span>
+        <span class="text-muted">&copy; 2024 Кафедра АСУ</span>
         <a href="#" class="nav-link px-2 text-muted">Пользовательское соглашение</a>
         <a href="#" class="nav-link px-2 text-muted">Политика конфиденциальности</a>
       </div>

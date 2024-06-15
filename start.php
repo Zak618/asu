@@ -94,7 +94,7 @@ if ($student_id) {
                 <h6 class="telegram-bot-title">TELEGRAM BOT</h6>
                 <div class="telegram-bot-content d-flex justify-content-center align-items-center">
                     <img src="./images/baseImage/robot.png" alt="Telegram Bot" class="img-fluid telegram-bot-image">
-                    <a href="https://t.me/your_bot" target="_blank" class="btn btn-primary telegram-bot-button ml-3">Начать</a>
+                    <a href="#" class="btn btn-primary telegram-bot-button ml-3" data-toggle="modal" data-target="#workInProgressModal">Начать</a>
                 </div>
                 <p class="mt-3">Получайте уведомления о ближайших мероприятиях и узнавайте о своем балансе.</p>
             </div>
@@ -103,7 +103,24 @@ if ($student_id) {
 </div>
 
 
-
+<div class="modal fade" id="workInProgressModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Информация</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          Мы работаем над этим, совсем скоро появится.
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Буду ждать</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
 <?php
 include_once "./base/footer.php";
