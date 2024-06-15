@@ -55,11 +55,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 errorMessage.classList.add('d-none');
             } else {
                 successMessage.classList.add('d-none');
+                errorMessage.textContent = data.message;
                 errorMessage.classList.remove('d-none');
             }
         })
         .catch(error => {
             successMessage.classList.add('d-none');
+            errorMessage.textContent = 'Произошла ошибка. Пожалуйста, попробуйте еще раз.';
             errorMessage.classList.remove('d-none');
         });
     });

@@ -13,9 +13,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     // Поиск токена в базе данных
-    $stmt = $conn->prepare("SELECT email FROM password_resets WHERE token = ? AND expiry > NOW()");
+    $stmt = $conn->prepare("SELECT email FROM password_resets WHERE token = ?");
+    if (!$stmt) {
+        echo json_encode(['status' => 'error', 'message' => 'Ошибка подготовки запроса.']);
+        exit;
+    }
+
     $stmt->bind_param("s", $token);
-    $stmt->execute();
+    if (!$stmt->execute()) {
+        echo json_encode(['status' => 'error', 'message' => 'Ошибка выполнения запроса.']);
+        exit;
+    }
+
     $stmt->store_result();
 
     if ($stmt->num_rows > 0) {
@@ -27,20 +36,30 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stmt->close();
 
         $stmt = $conn->prepare("UPDATE users SET password = ? WHERE email = ?");
+        if (!$stmt) {
+            echo json_encode(['status' => 'error', 'message' => 'Ошибка подготовки запроса для обновления пароля.']);
+            exit;
+        }
+
         $stmt->bind_param("ss", $hashedPassword, $email);
         if ($stmt->execute()) {
             // Удаление использованного токена
             $stmt->close();
             $stmt = $conn->prepare("DELETE FROM password_resets WHERE email = ?");
+            if (!$stmt) {
+                echo json_encode(['status' => 'error', 'message' => 'Ошибка подготовки запроса для удаления токена.']);
+                exit;
+            }
+
             $stmt->bind_param("s", $email);
             $stmt->execute();
 
             echo json_encode(['status' => 'success']);
         } else {
-            echo json_encode(['status' => 'error']);
+            echo json_encode(['status' => 'error', 'message' => 'Ошибка при обновлении пароля.']);
         }
     } else {
-        echo json_encode(['status' => 'error']);
+        echo json_encode(['status' => 'error', 'message' => 'Неверный или просроченный токен.']);
     }
 
     $stmt->close();

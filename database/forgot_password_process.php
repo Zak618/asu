@@ -19,41 +19,52 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $token = bin2hex(random_bytes(50));
         $expiry = date("Y-m-d H:i:s", strtotime('+1 hour'));
 
-        // Сохранение токена в базе данных
+        // Удаление существующего токена, если он есть
+        $stmt = $conn->prepare("DELETE FROM password_resets WHERE email = ?");
+        $stmt->bind_param("s", $email);
+        $stmt->execute();
         $stmt->close();
+
+        // Сохранение токена в базе данных
         $stmt = $conn->prepare("INSERT INTO password_resets (email, token, expiry) VALUES (?, ?, ?)");
         $stmt->bind_param("sss", $email, $token, $expiry);
-        $stmt->execute();
+        if ($stmt->execute()) {
+            // Настройка PHPMailer
+            $mail = new PHPMailer(true);
+            try {
+                // Настройки сервера
+                $mail->isSMTP();
+                $mail->Host = 'smtp.gmail.com';
+                $mail->SMTPAuth = true;
+                $mail->Username = 'webhacker.sup@gmail.com'; // email
+                $mail->Password = 'ifwv lcuy lbly uwtv'; // пароль
+                $mail->SMTPSecure = 'tls';
+                $mail->Port = 587;
 
-        // Настройка PHPMailer
-        $mail = new PHPMailer(true);
-        try {
-            // Настройки сервера
-            $mail->isSMTP();
-            $mail->Host = 'smtp.gmail.com';
-            $mail->SMTPAuth = true;
-            $mail->Username = ''; // email
-            $mail->Password = ''; // пароль
-            $mail->SMTPSecure = 'tls';
-            $mail->Port = 587;
+                // Установить кодировку
+                $mail->CharSet = 'UTF-8';
+                $mail->setLanguage('ru', '../vendor/phpmailer/phpmailer/language/');
 
-            // Получатели
-            $mail->setFrom('rolanzakirov@mail.ru', 'No Reply');
-            $mail->addAddress($email);
+                // Получатели
+                $mail->setFrom('webhacker.sup@gmail.com', 'ASU');
+                $mail->addAddress($email);
 
-            // Контент письма
-            $resetLink = "http://yourdomain.com/reset_password.php?token=" . $token;
-            $mail->isHTML(true);
-            $mail->Subject = 'Сброс пароля';
-            $mail->Body    = "Для сброса пароля перейдите по следующей ссылке: <a href='$resetLink'>$resetLink</a>";
+                // Контент письма
+                $resetLink = "http://localhost:8000/reset_password.php?token=" . $token;
+                $mail->isHTML(true);
+                $mail->Subject = 'Сброс пароля';
+                $mail->Body    = "Для сброса пароля перейдите по следующей ссылке: <a href='$resetLink'>$resetLink</a>";
 
-            $mail->send();
-            echo json_encode(['status' => 'success']);
-        } catch (Exception $e) {
-            echo json_encode(['status' => 'error', 'message' => $mail->ErrorInfo]);
+                $mail->send();
+                echo json_encode(['status' => 'success']);
+            } catch (Exception $e) {
+                echo json_encode(['status' => 'error', 'message' => $mail->ErrorInfo]);
+            }
+        } else {
+            echo json_encode(['status' => 'error', 'message' => 'Ошибка при сохранении токена сброса.']);
         }
     } else {
-        echo json_encode(['status' => 'error']);
+        echo json_encode(['status' => 'error', 'message' => 'Пользователь с таким email не найден.']);
     }
 
     $stmt->close();
