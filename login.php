@@ -2,7 +2,15 @@
 include_once "./base/header.php";
 include_once "./database/db.php";
 session_start();
+
+
+// Проверка, авторизован ли пользователь
+if (isset($_SESSION['user_id'])) {
+    header('Location: profile'); // Перенаправить на страницу профиля или другую страницу
+    exit();
+}
 ?>
+
 
 <div class="container">
     <div class="row justify-content-center">
@@ -30,8 +38,8 @@ session_start();
                 </form>
                 <div class="alert alert-danger mt-3 d-none" id="errorMessage"></div>
                 <div class="text-center mt-3">
-                    <p><a href="forgot_password.php">Забыли пароль?</a></p>
-                    <p>Еще нет аккаунта? <a href="register.php">Зарегистрироваться</a></p>
+                    <p><a href="forgot_password">Забыли пароль?</a></p>
+                    <p>Еще нет аккаунта? <a href="register">Зарегистрироваться</a></p>
                 </div>
             </div>
         </div>

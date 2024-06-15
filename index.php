@@ -1,11 +1,13 @@
 <?php
 // Функция для безопасного вывода данных
-function safe_output($data) {
+function safe_output($data)
+{
     return htmlspecialchars($data, ENT_QUOTES, 'UTF-8');
 }
 
 // Функция для валидации и нормализации путей
-function validate_path($path) {
+function validate_path($path)
+{
     $path = trim($path, '/');
     $path = explode('?', $path, 2)[0];
     $path = filter_var($path, FILTER_SANITIZE_URL);
@@ -57,10 +59,15 @@ switch ($request) {
     case 'admin_dashboard':
         require __DIR__ . '/admin_dashboard.php';
         break;
+    case 'forgot_password':
+        require __DIR__ . '/forgot_password.php';
+        break;
+    case 'reset_password':
+        require __DIR__ . '/reset_password.php';
+        break;
         // Добавьте другие маршруты по необходимости
     default:
         http_response_code(404);
         require __DIR__ . '/404.php';
         break;
 }
-?>

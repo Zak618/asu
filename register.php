@@ -1,6 +1,12 @@
 <?php
 include_once "./base/header.php";
 include_once "./database/db.php";
+
+// Проверка, авторизован ли пользователь
+if (isset($_SESSION['user_id'])) {
+    header('Location: profile'); // Перенаправить на страницу профиля или другую страницу
+    exit();
+}
 ?>
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/css/intlTelInput.css"/>
