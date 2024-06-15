@@ -79,7 +79,7 @@ include_once "./database/db.php";
                     Пожалуйста, заполните все поля корректно.
                 </div>
                 <div class="alert alert-success mt-3 d-none" id="successMessage">
-                    Регистрация успешна! <a href="login.php">Перейти на страницу авторизации</a>.
+                    Регистрация успешна! Пожалуйста, подтвердите ваш email.
                 </div>
             </div>
         </div>

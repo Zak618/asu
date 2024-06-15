@@ -1,6 +1,7 @@
 <?php
 include_once "./base/header.php";
 include_once "./database/db.php";
+session_start();
 ?>
 
 <div class="container">
@@ -8,6 +9,14 @@ include_once "./database/db.php";
         <div class="col-md-6 col-lg-4">
             <div class="login-form">
                 <h2 class="text-center mb-4">Авторизация</h2>
+                <?php if (isset($_SESSION['confirmation_message'])): ?>
+                    <div class="alert alert-success">
+                        <?php 
+                            echo $_SESSION['confirmation_message']; 
+                            unset($_SESSION['confirmation_message']);
+                        ?>
+                    </div>
+                <?php endif; ?>
                 <form id="loginForm" action="./database/login_process.php" method="POST">
                     <div class="mb-3">
                         <label for="email" class="form-label">Email</label>

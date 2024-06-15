@@ -1,11 +1,50 @@
 <?php
 include_once "db.php";
+require '../vendor/autoload.php'; // Если используете Composer
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
 
 // Функция для проверки временного email-домена
 function isDisposableEmail($email) {
     $disposableDomains = file('https://raw.githubusercontent.com/andreis/disposable-email-domains/master/domains.txt', FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
     $emailDomain = substr(strrchr($email, "@"), 1);
     return in_array($emailDomain, $disposableDomains);
+}
+
+// Функция для отправки письма
+function sendConfirmationEmail($email, $token) {
+    $mail = new PHPMailer(true);
+
+    try {
+        // Настройки сервера
+        $mail->isSMTP();
+        $mail->Host = 'smtp.gmail.com';
+        $mail->SMTPAuth = true;
+        $mail->Username = 'webhacker.sup@gmail.com'; // Ваш Gmail логин
+        $mail->Password = 'ifwv lcuy lbly uwtv'; // Ваш Gmail пароль
+        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+        $mail->Port = 587; // Используйте порт 587 для TLS
+
+        // Установить кодировку
+        $mail->CharSet = 'UTF-8';
+        $mail->setLanguage('ru', '../vendor/phpmailer/phpmailer/language/');
+
+        // Получатель
+        $mail->setFrom('webhacker.sup@gmail.com', 'ASU');
+        $mail->addAddress($email);
+
+        // Содержимое
+        $mail->isHTML(true);
+        $mail->Subject = 'Подтверждение email';
+        $mail->Body = "Пожалуйста, подтвердите ваш email, перейдя по следующей ссылке: ";
+        $mail->Body .= "<a href='http://localhost:8000/database/confirm_email.php?token=$token'>Подтвердить email</a>";
+
+        $mail->send();
+        return true;
+    } catch (Exception $e) {
+        error_log("Ошибка при отправке письма: {$mail->ErrorInfo}");
+        return false;
+    }
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -69,15 +108,25 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         // Установка роли по умолчанию
         $role = 1;
 
-        $sql = "INSERT INTO users (first_name, last_name, middle_name, group_name, email, phone_number, password, avatar_url, role)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        // Генерация токена подтверждения email
+        $token = bin2hex(random_bytes(16));
+
+        // Вставка данных пользователя в базу данных
+        $sql = "INSERT INTO users (first_name, last_name, middle_name, group_name, email, phone_number, password, avatar_url, role, email_confirm_token)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param("ssssssssi", $firstName, $lastName, $middleName, $groupName, $email, $phoneNumber, $hashedPassword, $avatarUrl, $role);
+        $stmt->bind_param("ssssssssss", $firstName, $lastName, $middleName, $groupName, $email, $phoneNumber, $hashedPassword, $avatarUrl, $role, $token);
 
         if ($stmt->execute()) {
-            header('Content-Type: application/json');
-            echo json_encode(['status' => 'success']);
+            // Отправка письма с подтверждением
+            if (sendConfirmationEmail($email, $token)) {
+                header('Content-Type: application/json');
+                echo json_encode(['status' => 'success']);
+            } else {
+                header('Content-Type: application/json');
+                echo json_encode(['status' => 'error', 'messages' => ["Ошибка при отправке письма подтверждения."]]);
+            }
         } else {
             header('Content-Type: application/json');
             echo json_encode(['status' => 'error', 'messages' => ["Ошибка: " . $sql . "<br>" . $conn->error]]);
